@@ -1,0 +1,248 @@
+/* ============================================================
+   retro-utils.css — utilidades visuales reusables.
+   Documentadas en docs/DESIGN_SYSTEM.md (sección Efectos).
+   ============================================================ */
+
+/* ---- Reset mínimo + base ---- */
+* {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+}
+
+html,
+body,
+#root {
+  width: 100%;
+  height: 100%;
+  overflow: hidden;
+  background: transparent;
+}
+
+body {
+  font-family: var(--font-system);
+  color: var(--crt-black);
+}
+
+/* Raíz común de layouts y gags (pantalla completa) */
+.layout-root,
+.gag-root {
+  position: absolute;
+  inset: 0;
+}
+
+.gag-root {
+  z-index: 100;
+  pointer-events: none;
+}
+
+/* ---- Bisel Windows 98/XP ---- */
+.bevel-out {
+  border: 2px solid;
+  border-color: #ffffff #6d6d6d #6d6d6d #ffffff;
+  box-shadow:
+    inset 1px 1px 0 rgba(255, 255, 255, 0.9),
+    inset -1px -1px 0 rgba(0, 0, 0, 0.35),
+    3px 3px 0 rgba(13, 13, 13, 0.45);
+}
+
+.bevel-in {
+  border: 2px solid;
+  border-color: #6d6d6d #ffffff #ffffff #6d6d6d;
+  box-shadow:
+    inset 2px 2px 3px rgba(0, 0, 0, 0.35),
+    inset -1px -1px 0 rgba(255, 255, 255, 0.8);
+}
+
+/* ---- Scanlines CRT (aplicar a un contenedor con position) ----
+   DESACTIVADAS por rendimiento: el multiply a pantalla completa en todos
+   los layouts costaba demasiado en la PC del productor (corre junto a
+   OBS + 5 NDI). La clase sigue existiendo en los layouts por si algún día
+   sobra GPU; ver DESIGN_SYSTEM.md, "Suciedad global". */
+.scanlines::after {
+  content: none;
+}
+
+/* Marco "manoseado": sombra interna despareja para ventanas/celdas */
+.smudge-frame {
+  box-shadow:
+    inset 4px 3px 9px rgba(60, 48, 22, 0.18),
+    inset -2px -5px 11px rgba(13, 13, 13, 0.22);
+}
+
+/* ---- Aberración cromática ---- */
+.chroma-text {
+  text-shadow:
+    2px 0 0 rgba(255, 0, 60, 0.75),
+    -2px 0 0 rgba(0, 255, 255, 0.75);
+}
+
+.chroma-hover {
+  transition: text-shadow 0.05s steps(2);
+}
+
+.chroma-hover:hover {
+  text-shadow:
+    3px 0 0 rgba(255, 0, 60, 0.8),
+    -3px 0 0 rgba(0, 255, 255, 0.8);
+}
+
+/* ---- Borde irregular "a mano" (requiere <WobbleFilterDefs /> montado) ---- */
+.wobble-border {
+  filter: url(#wobble);
+}
+
+/* ---- Paint / mano alzada (ver DESIGN_SYSTEM.md) ---- */
+
+/* Borde crayón: turbulencia más violenta que #wobble */
+.scribble-border {
+  filter: url(#scribble);
+}
+
+/* Sticker recortado: contorno blanco grueso alrededor de cualquier forma */
+.sticker {
+  filter: drop-shadow(2px 0 0 var(--bg-cloud-white)) drop-shadow(-2px 0 0 var(--bg-cloud-white))
+    drop-shadow(0 2px 0 var(--bg-cloud-white)) drop-shadow(0 -2px 0 var(--bg-cloud-white))
+    drop-shadow(4px 5px 0 rgba(13, 13, 13, 0.5));
+}
+
+/* Subrayado ondulado dibujado a mano (SVG data-uri repetible) */
+.hand-underline {
+  padding-bottom: 10px;
+  background-image: url('data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" width="60" height="10" viewBox="0 0 60 10"><path d="M2 6 Q 9 1, 16 6 T 30 5 T 44 7 T 58 4" fill="none" stroke="%23FF3EA5" stroke-width="3.5" stroke-linecap="round"/></svg>');
+  background-repeat: repeat-x;
+  background-position: 0 100%;
+  background-size: 60px 10px;
+}
+
+/* ---- Marquee (CSS puro, nunca el tag <marquee>) ---- */
+.marquee {
+  overflow: hidden;
+  white-space: nowrap;
+}
+
+.marquee-inner {
+  display: inline-block;
+  padding-left: 100%;
+  animation: marquee-scroll 14s linear infinite;
+}
+
+@keyframes marquee-scroll {
+  from {
+    transform: translateX(0);
+  }
+  to {
+    transform: translateX(-100%);
+  }
+}
+
+/* ---- Cursor retro (mano pixelada, fallback pointer) ---- */
+.cursor-retro,
+.cursor-retro * {
+  cursor:
+    url('data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24"><path d="M9 1h3v10h2V5h3v6h2V7h3v10l-3 6H9l-5-7 2-2 3 3V1z" fill="white" stroke="black" stroke-width="1.5"/></svg>')
+      8 2,
+    pointer;
+}
+
+/* ---- Cinta de peligro ---- */
+.danger-tape {
+  background: repeating-linear-gradient(
+    45deg,
+    var(--warning-yellow) 0px,
+    var(--warning-yellow) 18px,
+    var(--crt-black) 18px,
+    var(--crt-black) 36px
+  );
+}
+
+/* ---- Gradientes predefinidos (ángulos raros a propósito) ---- */
+.gradient-kazaa {
+  background: linear-gradient(
+    137deg,
+    var(--xp-blue-deep) 0%,
+    var(--xp-blue-bright) 34%,
+    var(--aero-teal) 71%,
+    var(--aero-lime) 100%
+  );
+}
+
+.gradient-aero {
+  background: linear-gradient(
+    23deg,
+    var(--bg-cloud-white) 0%,
+    var(--aero-teal) 42%,
+    var(--xp-blue-bright) 78%,
+    var(--y2k-purple) 100%
+  );
+}
+
+.gradient-gag {
+  background: linear-gradient(
+    68deg,
+    var(--y2k-purple) 0%,
+    var(--y2k-magenta) 37%,
+    var(--warning-yellow) 82%,
+    var(--aero-lime) 100%
+  );
+}
+
+/* ---- Sparkles ---- */
+.sparkle {
+  display: inline-block;
+  animation: sparkle-blink 0.9s steps(3) infinite;
+}
+
+.sparkle:nth-child(2n) {
+  animation-delay: 0.3s;
+}
+
+.sparkle:nth-child(3n) {
+  animation-delay: 0.6s;
+}
+
+@keyframes sparkle-blink {
+  0%,
+  100% {
+    opacity: 1;
+    transform: scale(1) rotate(0deg);
+  }
+  50% {
+    opacity: 0.25;
+    transform: scale(0.6) rotate(20deg);
+  }
+}
+
+/* ---- Parpadeo brusco (alertas) ---- */
+.blink-hard {
+  animation: blink-hard 0.35s steps(2) infinite;
+}
+
+@keyframes blink-hard {
+  50% {
+    opacity: 0.15;
+  }
+}
+
+/* ---- Shake (alertas / gags) ---- */
+.shake-hard {
+  animation: shake-hard 0.28s steps(4) infinite;
+}
+
+@keyframes shake-hard {
+  0% {
+    transform: translate(0, 0) rotate(0deg);
+  }
+  25% {
+    transform: translate(-6px, 3px) rotate(-0.8deg);
+  }
+  50% {
+    transform: translate(5px, -4px) rotate(0.6deg);
+  }
+  75% {
+    transform: translate(-3px, -2px) rotate(-0.4deg);
+  }
+  100% {
+    transform: translate(4px, 3px) rotate(0.7deg);
+  }
+}

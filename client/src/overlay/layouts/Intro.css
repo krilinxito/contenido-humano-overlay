@@ -1,0 +1,88 @@
+.intro {
+  display: flex;
+  gap: 18px;
+  padding: 26px 30px 70px;
+  overflow: hidden;
+}
+
+.intro__main {
+  flex: 1 1 72%;
+  min-width: 0;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: var(--space-2);
+}
+
+.intro__slogan {
+  font-family: var(--font-hand);
+  font-size: clamp(22px, 2.6vw, 40px);
+  color: var(--crt-black);
+  text-align: center;
+  transform: rotate(-1.3deg);
+}
+
+.intro__avatars {
+  position: relative;
+  width: 100%;
+  flex: 1;
+  min-height: 0;
+}
+
+.intro__chat {
+  flex: 0 0 25%;
+  min-width: 0;
+}
+
+.intro__chat-window {
+  width: 100%;
+  height: 100%;
+}
+
+.intro__doodle {
+  position: absolute;
+  z-index: 5;
+  pointer-events: none;
+}
+
+.intro__doodle--star1 {
+  top: 8%;
+  left: 4%;
+  transform: rotate(-15deg);
+}
+
+.intro__doodle--star2 {
+  top: 30%;
+  left: 12%;
+  transform: rotate(22deg);
+}
+
+.intro__doodle--arrow {
+  top: 16%;
+  right: 30%;
+  transform: rotate(35deg) scaleX(-1);
+}
+
+.intro__doodle--squiggle {
+  bottom: 14%;
+  left: 6%;
+  transform: rotate(-8deg);
+}
+
+.intro__marquee-wrap {
+  position: absolute;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  padding: 3px 0;
+}
+
+.intro__marquee {
+  font-family: var(--font-impact-alt);
+  font-size: 24px;
+  color: var(--crt-black);
+  background: var(--warning-yellow);
+  border-top: 3px solid var(--crt-black);
+  border-bottom: 3px solid var(--crt-black);
+}

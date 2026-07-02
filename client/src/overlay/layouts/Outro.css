@@ -1,0 +1,134 @@
+.outro {
+  background: radial-gradient(
+    ellipse at 50% 40%,
+    var(--xp-blue-deep) 0%,
+    var(--crt-black) 85%
+  );
+  overflow: hidden;
+}
+
+.outro__roll-wrap {
+  position: absolute;
+  inset: 0 0 40px;
+  z-index: 10;
+  overflow: hidden;
+  pointer-events: none;
+}
+
+.outro__roll {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: var(--space-4);
+  animation: outro-roll 38s linear infinite;
+}
+
+@keyframes outro-roll {
+  from {
+    transform: translateY(100vh);
+  }
+  to {
+    transform: translateY(-100%);
+  }
+}
+
+.outro__titulo {
+  font-family: var(--font-impact);
+  font-size: clamp(48px, 7vw, 110px);
+  color: var(--bg-cloud-white);
+  transform: rotate(-2deg);
+}
+
+.outro__subtitulo {
+  font-family: var(--font-comic);
+  font-size: 24px;
+  color: var(--chrome-silver);
+  margin-top: calc(-1 * var(--space-3));
+}
+
+/* Contenedor de los créditos de miembros: filas de alto fijo (250px, ver
+   CREDIT_ROW_PX en Outro.tsx) para que el AvatarColumn superpuesto alinee
+   cada busto con su fila sin medir el DOM. */
+.outro__creditos {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+}
+
+.outro__creditos .outro__credito {
+  height: 250px;
+  /* Posicionado para pintar por encima del canvas superpuesto del
+     AvatarColumn (que va antes en el DOM): el texto nunca queda tapado */
+  position: relative;
+}
+
+.outro__credito {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 2px;
+}
+
+.outro__credito-avatar {
+  position: relative;
+  width: 150px;
+  height: 150px;
+}
+
+.outro__credito-nombre {
+  font-family: var(--font-hand);
+  font-size: 40px;
+  text-shadow: 2px 2px 0 var(--crt-black);
+}
+
+.outro__credito-rol {
+  font-family: var(--font-comic);
+  font-weight: bold;
+  font-size: 20px;
+  color: var(--bg-cloud-white);
+}
+
+.outro__credito--extra .outro__credito-rol {
+  font-family: var(--font-pixel);
+  font-size: 14px;
+  color: var(--aero-teal);
+}
+
+.outro__credito--extra .outro__credito-nombre {
+  font-size: 28px;
+  color: var(--bg-cloud-white);
+}
+
+.outro__slogan {
+  max-width: 60%;
+  text-align: center;
+  font-family: var(--font-hand);
+  font-size: 30px;
+  color: var(--aero-lime);
+  margin-top: var(--space-4);
+}
+
+.outro__gracias {
+  font-family: var(--font-hand);
+  font-size: clamp(40px, 5vw, 72px);
+  color: var(--y2k-magenta);
+  text-shadow: 3px 3px 0 var(--crt-black);
+  margin-bottom: 120px;
+}
+
+.outro__marquee-wrap {
+  position: absolute;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  z-index: 15;
+}
+
+.outro__marquee {
+  padding: 4px 0;
+  font-family: var(--font-terminal);
+  font-size: 24px;
+  color: var(--warning-yellow);
+  background: var(--crt-black);
+  border-top: 3px solid var(--y2k-magenta);
+}

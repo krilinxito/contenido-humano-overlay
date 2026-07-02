@@ -1,0 +1,29 @@
+.screen-plus-cams {
+  position: absolute;
+  inset: 0;
+  display: flex;
+  gap: 16px;
+  padding: 28px 30px 36px;
+}
+
+.screen-plus-cams__screen {
+  flex: 1 1 78%;
+  min-width: 0;
+}
+
+.screen-plus-cams__window {
+  width: 100%;
+  height: 100%;
+}
+
+.screen-plus-cams__strip {
+  flex: 0 0 19%;
+  min-width: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.screen-plus-cams__cell {
+  flex: 1;
+}

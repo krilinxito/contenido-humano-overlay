@@ -1,0 +1,12 @@
+# Dependencias
+node_modules/
+
+# Build del client
+client/dist/
+
+# Config local de OBS (tiene la contraseña del obs-websocket)
+server/obs-config.json
+
+# Varios
+*.log
+.DS_Store

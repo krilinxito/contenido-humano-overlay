@@ -1,0 +1,49 @@
+.tema {
+  overflow: hidden;
+}
+
+.tema__titulo {
+  position: absolute;
+  top: 36px;
+  left: 44px;
+  z-index: 15;
+  display: flex;
+  align-items: baseline;
+  gap: 12px;
+  padding: 6px 18px;
+  background: linear-gradient(
+    113deg,
+    var(--y2k-magenta) 0%,
+    var(--y2k-purple) 60%,
+    var(--xp-blue-deep) 100%
+  );
+  pointer-events: none;
+}
+
+.tema__titulo-hoy {
+  font-family: var(--font-hand);
+  font-size: 24px;
+  color: var(--aero-lime);
+}
+
+.tema__titulo-cual {
+  font-family: var(--font-impact);
+  font-size: clamp(18px, 2.2vw, 32px);
+  color: var(--bg-cloud-white);
+}
+
+.tema__doodle-arrow {
+  position: absolute;
+  top: 100px;
+  left: 8%;
+  transform: rotate(48deg);
+  z-index: 15;
+}
+
+.tema__doodle-star {
+  position: absolute;
+  bottom: 9%;
+  left: 3%;
+  transform: rotate(-14deg);
+  z-index: 15;
+}

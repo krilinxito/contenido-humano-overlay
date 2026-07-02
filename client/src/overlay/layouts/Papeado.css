@@ -1,0 +1,138 @@
+.papeado {
+  background: radial-gradient(
+    ellipse at 50% 30%,
+    var(--y2k-purple) 0%,
+    var(--xp-blue-deep) 55%,
+    var(--crt-black) 100%
+  );
+  overflow: hidden;
+}
+
+.papeado__titulo-wrap {
+  position: absolute;
+  top: 24px;
+  left: -3%;
+  right: -3%;
+  display: flex;
+  justify-content: center;
+  padding: 8px 0;
+  transform: rotate(-1deg);
+  z-index: 10;
+}
+
+.papeado__titulo {
+  font-family: var(--font-impact);
+  font-size: clamp(26px, 3.4vw, 52px);
+  color: var(--bg-cloud-white);
+  background: var(--crt-black);
+  padding: 4px 26px;
+}
+
+/* ---- Redoble (sin perdedor elegido) ---- */
+.papeado__candidatos {
+  position: absolute;
+  inset: 120px 0 30px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: var(--space-3);
+}
+
+.papeado__redoble {
+  font-family: var(--font-hand);
+  font-size: clamp(28px, 3vw, 46px);
+  color: var(--warning-yellow);
+  text-shadow: 2px 2px 0 var(--crt-black);
+}
+
+.papeado__row {
+  width: 86%;
+  flex: 1;
+  min-height: 0;
+  animation: papeado-tiemble 0.5s ease-in-out infinite;
+}
+
+@keyframes papeado-tiemble {
+  0%,
+  100% {
+    transform: rotate(-0.8deg);
+  }
+  50% {
+    transform: rotate(0.9deg);
+  }
+}
+
+/* ---- Spotlight (perdedor elegido) ---- */
+.papeado__spotlight-wrap {
+  position: absolute;
+  inset: 90px 0 0;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: var(--space-3);
+}
+
+.papeado__spotlight {
+  position: absolute;
+  inset: 0;
+  background: radial-gradient(
+    circle at 50% 45%,
+    transparent 0%,
+    transparent 22%,
+    rgba(13, 13, 13, 0.82) 58%
+  );
+  pointer-events: none;
+}
+
+.papeado__perdedor {
+  position: relative;
+  z-index: 2;
+}
+
+.papeado__sello {
+  position: absolute;
+  top: 38%;
+  left: 50%;
+  margin-left: -160px;
+  width: 320px;
+  text-align: center;
+  font-family: var(--font-impact-alt);
+  font-size: 58px;
+  color: var(--y2k-magenta);
+  border: 6px solid var(--y2k-magenta);
+  background: rgba(13, 13, 13, 0.35);
+  text-shadow: 2px 2px 0 var(--crt-black);
+  z-index: 3;
+}
+
+.papeado__penitencia {
+  position: relative;
+  z-index: 2;
+  display: flex;
+  align-items: baseline;
+  gap: 12px;
+  padding: 10px 24px;
+  background: var(--warning-yellow);
+}
+
+.papeado__penitencia-label {
+  font-family: var(--font-pixel);
+  font-size: 16px;
+  color: var(--crt-black);
+}
+
+.papeado__penitencia-text {
+  font-family: var(--font-hand);
+  font-size: clamp(24px, 2.6vw, 40px);
+  color: var(--crt-black);
+}
+
+.papeado__doodle-arrow {
+  position: absolute;
+  top: 18%;
+  right: 22%;
+  transform: rotate(115deg);
+  z-index: 3;
+}

@@ -1,0 +1,48 @@
+.fake-chat {
+  position: absolute;
+  inset: 0;
+  display: flex;
+  flex-direction: column;
+  background: var(--bg-cloud-white);
+}
+
+.fake-chat__list {
+  flex: 1;
+  list-style: none;
+  padding: var(--space-2);
+  overflow: hidden;
+  display: flex;
+  flex-direction: column;
+  justify-content: flex-end;
+  gap: 6px;
+}
+
+.fake-chat__msg {
+  font-family: var(--font-comic);
+  font-size: 17px;
+  line-height: 1.25;
+  color: var(--crt-black);
+}
+
+.fake-chat__msg:nth-child(2n) {
+  background: rgba(180, 244, 97, 0.35);
+}
+
+.fake-chat__user {
+  font-family: var(--font-pixel);
+  font-size: 12px;
+  color: var(--y2k-purple);
+}
+
+.fake-chat__msg:nth-child(3n) .fake-chat__user {
+  color: var(--y2k-magenta);
+}
+
+.fake-chat__input {
+  margin: var(--space-2);
+  padding: 5px 8px;
+  font-family: var(--font-terminal);
+  font-size: 16px;
+  color: var(--xp-blue-deep);
+  background: white;
+}

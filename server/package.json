@@ -1,0 +1,15 @@
+{
+  "name": "contenido-humano-server",
+  "version": "0.1.0",
+  "private": true,
+  "type": "module",
+  "main": "index.js",
+  "scripts": {
+    "start": "node index.js"
+  },
+  "dependencies": {
+    "express": "^4.21.2",
+    "obs-websocket-js": "^5.0.8",
+    "socket.io": "^4.8.1"
+  }
+}

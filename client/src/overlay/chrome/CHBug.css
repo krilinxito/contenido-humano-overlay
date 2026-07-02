@@ -1,0 +1,95 @@
+/* Default abajo a la izquierda para no tapar cámaras */
+.ch-bug-wrap {
+  position: absolute;
+  bottom: 24px;
+  left: 26px;
+  z-index: 50;
+  width: 150px;
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  pointer-events: none;
+}
+
+/* Variante arriba a la derecha (Noticiero: el zócalo ocupa abajo) */
+.ch-bug-wrap--top-right {
+  bottom: auto;
+  left: auto;
+  top: 22px;
+  right: 26px;
+}
+
+/* El transform animado vive acá y no en .ch-bug: el filtro #wobble de
+   .ch-bug así rasteriza UNA vez y el sway es compositing puro. */
+.ch-bug-sway {
+  transform: rotate(-6deg);
+  animation: ch-bug-sway 3.2s ease-in-out infinite;
+}
+
+.ch-bug {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  padding: 10px 14px;
+  background: linear-gradient(
+    23deg,
+    var(--y2k-purple) 0%,
+    var(--y2k-magenta) 60%,
+    var(--warning-yellow) 100%
+  );
+  border: 3px solid var(--bg-cloud-white);
+}
+
+@keyframes ch-bug-sway {
+  0%,
+  100% {
+    transform: rotate(-6deg);
+  }
+  50% {
+    transform: rotate(-3.5deg) scale(1.03);
+  }
+}
+
+.ch-bug__ch {
+  font-family: var(--font-impact-alt);
+  font-size: 34px;
+  line-height: 1;
+  color: var(--bg-cloud-white);
+  text-shadow: 2px 2px 0 var(--crt-black);
+}
+
+.ch-bug__text {
+  font-family: var(--font-pixel);
+  font-size: 10px;
+  color: var(--bg-cloud-white);
+  text-shadow: 1px 1px 0 var(--crt-black);
+}
+
+.ch-bug__slogan {
+  font-family: var(--font-hand);
+  font-size: 13px;
+  color: var(--bg-cloud-white);
+  background: rgba(13, 13, 13, 0.7);
+  padding: 1px 4px;
+  transform: rotate(-2deg);
+}
+
+/* Versión XL para el layout de Intro */
+.ch-bug-wrap--xl {
+  position: static;
+  width: auto;
+  align-items: center;
+}
+
+.ch-bug-wrap--xl .ch-bug {
+  padding: 22px 38px;
+  border-width: 6px;
+}
+
+.ch-bug-wrap--xl .ch-bug__ch {
+  font-size: 130px;
+}
+
+.ch-bug-wrap--xl .ch-bug__text {
+  font-size: 26px;
+}

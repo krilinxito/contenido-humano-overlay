@@ -1,0 +1,108 @@
+.penitencia {
+  background: radial-gradient(
+    ellipse at 50% 20%,
+    var(--y2k-magenta) 0%,
+    var(--y2k-purple) 45%,
+    var(--crt-black) 100%
+  );
+  overflow: hidden;
+}
+
+/* ---- Selección ---- */
+.penitencia__pick {
+  position: absolute;
+  inset: 0;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: var(--space-3);
+  padding: 40px 30px;
+}
+
+.penitencia__pick-title {
+  font-family: var(--font-impact);
+  font-size: clamp(40px, 6vw, 92px);
+  color: var(--bg-cloud-white);
+}
+
+.penitencia__pick-row {
+  width: 88%;
+  flex: 1;
+  min-height: 0;
+}
+
+/* ---- Escenario ---- */
+.penitencia__stage {
+  position: absolute;
+  inset: 0;
+  display: flex;
+  gap: 18px;
+  padding: 30px 32px 38px;
+}
+
+.penitencia__castigado {
+  flex: 1 1 70%;
+  min-width: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.penitencia__marco {
+  flex: 1;
+  min-height: 0;
+  padding: 12px;
+}
+
+.penitencia__window {
+  width: 100%;
+  height: 100%;
+}
+
+.penitencia__cartel {
+  align-self: center;
+  display: flex;
+  align-items: baseline;
+  gap: 12px;
+  padding: 8px 22px;
+  background: var(--warning-yellow);
+}
+
+.penitencia__cartel-label {
+  font-family: var(--font-pixel);
+  font-size: 15px;
+  color: var(--crt-black);
+}
+
+.penitencia__cartel-text {
+  font-family: var(--font-hand);
+  font-size: clamp(22px, 2.4vw, 36px);
+  color: var(--crt-black);
+}
+
+.penitencia__testigos {
+  flex: 0 0 26%;
+  min-width: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.penitencia__testigos-label {
+  font-family: var(--font-hand);
+  font-size: 20px;
+  color: var(--bg-cloud-white);
+  text-align: center;
+  transform: rotate(-1.5deg);
+}
+
+.penitencia__testigo {
+  flex: 1;
+  min-height: 0;
+}
+
+.penitencia__cam {
+  width: 100%;
+  height: 100%;
+}

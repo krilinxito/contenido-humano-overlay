@@ -1,0 +1,44 @@
+/* ============================================================
+   tokens.css — paleta y tipografías centralizadas.
+   Fuente de verdad: docs/DESIGN_SYSTEM.md. No inventar colores
+   ni fuentes por fuera de este archivo.
+   ============================================================ */
+
+:root {
+  /* ---- Paleta ---- */
+  --xp-blue-deep: #0a246a; /* azul título de ventana XP */
+  --xp-blue-bright: #3d7eff; /* azul brillante de botones/links */
+  --aero-teal: #00c9a7; /* verde-azulado tipo Frutiger Aero */
+  --aero-lime: #b4f461; /* verde lima saturado */
+  --y2k-magenta: #ff3ea5; /* magenta chicle */
+  --y2k-purple: #7b2ff7; /* violeta saturado */
+  --chrome-silver: #d9e4ec; /* superficies "metálicas" tipo iMac G3 */
+  --warning-yellow: #ffe135; /* amarillo alerta / cinta de peligro */
+  --bg-cloud-white: #f4f9ff; /* fondo tipo cielo con nubes XP */
+  --crt-black: #0d0d0d; /* negro para scanlines/vignette */
+
+  /* RESERVADO: color llave del filtro Color Key de OBS (agujeros de cámara
+     en modo ?cams=real, ver docs/ARCHITECTURE.md). NUNCA usarlo en diseño:
+     cualquier píxel de este color se vuelve transparente en el stream. */
+  --obs-key-magenta: #ff00ff;
+
+  /* ---- Tonos de piel de los avatares (espejo en config/members.ts) ---- */
+  --skin-light: #f2c49b;
+  --skin-tan: #d99a6c;
+  --skin-brown: #9c6b43;
+
+  /* ---- Tipografías (ver DESIGN_SYSTEM.md para contexto de uso) ---- */
+  --font-impact: 'Rubik Mono One', 'Bungee', sans-serif;
+  --font-impact-alt: 'Bungee', 'Rubik Mono One', sans-serif;
+  --font-comic: 'Comic Neue', 'Comic Sans MS', cursive;
+  --font-system: Tahoma, 'Trebuchet MS', Verdana, sans-serif;
+  --font-pixel: 'Silkscreen', monospace;
+  --font-terminal: 'VT323', monospace;
+  --font-hand: 'Gochi Hand', 'Patrick Hand', 'Comic Neue', cursive;
+
+  /* ---- Espaciado base (desviarse ±3px está permitido) ---- */
+  --space-1: 4px;
+  --space-2: 8px;
+  --space-3: 16px;
+  --space-4: 32px;
+}

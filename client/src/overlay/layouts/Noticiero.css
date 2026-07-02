@@ -1,0 +1,59 @@
+.noticiero {
+  overflow: hidden;
+}
+
+/* ---- Zócalo ---- */
+.noticiero__zocalo {
+  position: absolute;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  z-index: 10;
+  display: flex;
+  flex-direction: column;
+}
+
+.noticiero__titulo {
+  display: flex;
+  align-items: stretch;
+  gap: 0;
+  margin: 0 26px 8px;
+  background: linear-gradient(
+    97deg,
+    var(--xp-blue-deep) 0%,
+    var(--xp-blue-bright) 47%,
+    var(--aero-teal) 100%
+  );
+}
+
+.noticiero__titulo-tag {
+  display: flex;
+  align-items: center;
+  padding: 8px 14px;
+  font-family: var(--font-pixel);
+  font-size: 18px;
+  color: var(--crt-black);
+  background: var(--warning-yellow);
+  animation: blink-hard 0.7s steps(2) infinite;
+}
+
+.noticiero__titulo-text {
+  display: flex;
+  align-items: center;
+  padding: 8px 18px;
+  font-family: var(--font-impact);
+  font-size: clamp(18px, 2.6vw, 34px);
+  color: var(--bg-cloud-white);
+}
+
+.noticiero__ticker {
+  background: var(--crt-black);
+  border-top: 4px solid var(--warning-yellow);
+}
+
+.noticiero__ticker-marquee {
+  padding: 4px 0;
+  font-family: var(--font-terminal);
+  font-size: 26px;
+  color: var(--warning-yellow);
+}

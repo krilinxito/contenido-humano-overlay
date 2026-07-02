@@ -1,0 +1,69 @@
+.tertulia {
+  overflow: hidden;
+}
+
+/* ---- Selección "¿quién empieza?" ---- */
+.tertulia__pick {
+  position: absolute;
+  inset: 0;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: var(--space-3);
+  padding: 40px 30px;
+}
+
+.tertulia__pick-title {
+  font-family: var(--font-impact);
+  font-size: clamp(40px, 6vw, 92px);
+  color: var(--bg-cloud-white);
+}
+
+.tertulia__pick-row {
+  width: 88%;
+  flex: 1;
+  min-height: 0;
+}
+
+/* ---- Escenario con miembro elegido ---- */
+.tertulia__stage {
+  position: absolute;
+  inset: 0;
+  display: flex;
+  align-items: stretch;
+  gap: 20px;
+  padding: 32px 34px 40px;
+}
+
+.tertulia__cam {
+  flex: 1 1 68%;
+  min-width: 0;
+}
+
+.tertulia__window {
+  width: 100%;
+  height: 100%;
+}
+
+.tertulia__badge {
+  flex: 0 0 30%;
+  position: relative;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.tertulia__arrow {
+  position: absolute;
+  left: -80px;
+  top: 30%;
+  transform: rotate(160deg);
+}
+
+.tertulia__doodle-circle {
+  position: absolute;
+  bottom: 6%;
+  left: 4%;
+  transform: rotate(-10deg);
+}

@@ -1,0 +1,16 @@
+{
+  "enabled": false,
+  "url": "ws://127.0.0.1:4455",
+  "password": "PONE_AQUI_LA_PASSWORD_DEL_OBS_WEBSOCKET",
+  "scene": "PROGRAMA",
+  "sources": {
+    "chavez": "CAM Chavez",
+    "aym": "CAM Aym",
+    "mots": "CAM Mots",
+    "darbolis": "CAM Darbolis",
+    "krilin": "CAM Krilin",
+    "general": "CAM General",
+    "noticiero": "CAM Noticiero",
+    "plano360": "CAM 360"
+  }
+}

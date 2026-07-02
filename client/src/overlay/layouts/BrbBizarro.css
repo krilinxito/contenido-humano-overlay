@@ -1,0 +1,61 @@
+.brb-bizarro {
+  overflow: hidden;
+}
+
+.brb-bizarro__text-wrap {
+  position: absolute;
+  inset: 0;
+  z-index: 10;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: var(--space-3);
+  pointer-events: none;
+}
+
+.brb-bizarro__title {
+  font-family: var(--font-impact);
+  font-size: clamp(52px, 9vw, 130px);
+  color: var(--bg-cloud-white);
+  -webkit-text-stroke: 3px var(--crt-black);
+  animation: brb-wiggle 1.6s ease-in-out infinite;
+}
+
+@keyframes brb-wiggle {
+  0%,
+  100% {
+    transform: rotate(-3deg) scale(1);
+  }
+  50% {
+    transform: rotate(2deg) scale(1.04);
+  }
+}
+
+.brb-bizarro__subtitle {
+  font-family: var(--font-comic);
+  font-weight: bold;
+  font-size: clamp(18px, 2.4vw, 32px);
+  color: var(--crt-black);
+  background: var(--aero-lime);
+  padding: 6px 18px;
+  box-shadow: 4px 4px 0 var(--y2k-purple);
+}
+
+.brb-bizarro__sparkles {
+  display: flex;
+  gap: var(--space-4);
+  font-size: 34px;
+  color: var(--warning-yellow);
+  text-shadow: 2px 2px 0 var(--y2k-magenta);
+}
+
+.brb-bizarro__tape {
+  position: absolute;
+  left: -5%;
+  right: -5%;
+  bottom: 42px;
+  height: 34px;
+  transform: rotate(-1.6deg);
+  opacity: 0.92;
+}

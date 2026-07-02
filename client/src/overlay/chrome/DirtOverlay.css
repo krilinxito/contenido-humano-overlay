@@ -1,0 +1,133 @@
+.dirt {
+  position: absolute;
+  inset: 0;
+  z-index: 180;
+  pointer-events: none;
+  overflow: hidden;
+}
+
+/* Grano de película animado */
+.dirt__grain {
+  position: absolute;
+  inset: -12%;
+  background-image: url('data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" width="240" height="240"><filter id="g"><feTurbulence type="fractalNoise" baseFrequency="0.8" numOctaves="2"/></filter><rect width="240" height="240" filter="url(%23g)"/></svg>');
+  opacity: 0.07;
+  mix-blend-mode: overlay;
+  animation: dirt-grain-jump 0.45s steps(3) infinite;
+  /* Capa propia: la turbulencia rasteriza una vez y el salto steps(3)
+     queda en el compositor, sin repintar el viewport entero */
+  will-change: transform;
+}
+
+@keyframes dirt-grain-jump {
+  0% {
+    transform: translate(0, 0);
+  }
+  33% {
+    transform: translate(-3%, 2%);
+  }
+  66% {
+    transform: translate(2%, -3%);
+  }
+  100% {
+    transform: translate(-1%, 1%);
+  }
+}
+
+/* Viñeta CRT marcada */
+.dirt__vignette {
+  position: absolute;
+  inset: 0;
+  background: radial-gradient(
+    ellipse at 50% 48%,
+    transparent 58%,
+    rgba(13, 13, 13, 0.22) 86%,
+    rgba(13, 13, 13, 0.45) 100%
+  );
+  mix-blend-mode: multiply;
+  /* Estática: promover a capa propia para que rasterice una sola vez */
+  will-change: transform;
+}
+
+/* Manchas tipo café / dedos grasosos */
+.dirt__stain {
+  position: absolute;
+  border-radius: 50%;
+  mix-blend-mode: multiply;
+  filter: blur(2px);
+  /* Estáticas: capa propia para que el blur rasterice una sola vez */
+  will-change: transform;
+}
+
+.dirt__stain--1 {
+  top: -60px;
+  right: 18%;
+  width: 210px;
+  height: 170px;
+  background: radial-gradient(
+    ellipse,
+    transparent 52%,
+    rgba(122, 89, 30, 0.18) 62%,
+    rgba(122, 89, 30, 0.07) 70%,
+    transparent 76%
+  );
+  transform: rotate(-16deg);
+}
+
+.dirt__stain--2 {
+  bottom: 8%;
+  right: -70px;
+  width: 260px;
+  height: 240px;
+  background: radial-gradient(
+    ellipse,
+    rgba(60, 48, 22, 0.1) 0%,
+    rgba(60, 48, 22, 0.05) 45%,
+    transparent 70%
+  );
+}
+
+.dirt__stain--3 {
+  top: 30%;
+  left: -50px;
+  width: 170px;
+  height: 220px;
+  background: radial-gradient(
+    ellipse,
+    transparent 48%,
+    rgba(90, 90, 90, 0.14) 60%,
+    transparent 72%
+  );
+  transform: rotate(24deg);
+}
+
+/* Pelo de VHS que cruza cada tanto */
+.dirt__hair {
+  position: absolute;
+  top: -10%;
+  left: 38%;
+  width: 2px;
+  height: 55%;
+  background: rgba(13, 13, 13, 0.5);
+  border-radius: 40%;
+  transform: rotate(9deg);
+  opacity: 0;
+  animation: dirt-hair 13s steps(2) infinite;
+}
+
+@keyframes dirt-hair {
+  0%,
+  87% {
+    opacity: 0;
+  }
+  88%,
+  94% {
+    opacity: 0.6;
+    transform: rotate(9deg) translateX(0);
+  }
+  95%,
+  100% {
+    opacity: 0.55;
+    transform: rotate(11deg) translateX(30px);
+  }
+}

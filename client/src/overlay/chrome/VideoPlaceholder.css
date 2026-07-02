@@ -1,0 +1,93 @@
+.video-placeholder {
+  position: absolute;
+  inset: 0;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: var(--space-2);
+  overflow: hidden;
+  background:
+    radial-gradient(circle at 50% 42%, rgba(61, 126, 255, 0.25) 0%, transparent 60%),
+    var(--crt-black);
+}
+
+.video-placeholder__play {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: clamp(54px, 7vw, 110px);
+  height: clamp(54px, 7vw, 110px);
+  border-radius: 50%;
+  font-size: clamp(22px, 3vw, 46px);
+  color: var(--crt-black);
+  background: var(--bg-cloud-white);
+  border: 5px solid var(--y2k-magenta);
+  padding-left: 8px;
+}
+
+.video-placeholder__label {
+  font-family: var(--font-impact);
+  font-size: clamp(16px, 2.2vw, 34px);
+  color: var(--bg-cloud-white);
+  text-align: center;
+  padding: var(--space-1) var(--space-3);
+  transform: rotate(-1.2deg);
+}
+
+.video-placeholder__controls {
+  position: absolute;
+  left: 10px;
+  right: 10px;
+  bottom: 10px;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.video-placeholder__time,
+.video-placeholder__vol {
+  font-family: var(--font-terminal);
+  font-size: 18px;
+  color: var(--aero-lime);
+  flex-shrink: 0;
+}
+
+.video-placeholder__bar {
+  flex: 1;
+  height: 12px;
+  background: #2a2a2a;
+}
+
+.video-placeholder__progress {
+  height: 100%;
+  width: 20%;
+  background: linear-gradient(90deg, var(--aero-teal), var(--aero-lime));
+  animation: video-progress 34s linear infinite;
+}
+
+@keyframes video-progress {
+  from {
+    width: 4%;
+  }
+  to {
+    width: 97%;
+  }
+}
+
+.video-placeholder__buffering {
+  position: absolute;
+  top: 10px;
+  right: 12px;
+  font-family: var(--font-pixel);
+  font-size: 12px;
+  color: var(--warning-yellow);
+}
+
+/* Formato reel: marco de teléfono trucho */
+.video-placeholder--vertical {
+  border-left: 10px solid #2a2a2a;
+  border-right: 10px solid #2a2a2a;
+  border-top: 26px solid #2a2a2a;
+  border-bottom: 26px solid #2a2a2a;
+}

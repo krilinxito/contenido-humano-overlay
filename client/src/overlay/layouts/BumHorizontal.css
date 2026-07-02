@@ -1,0 +1,56 @@
+.bum-h {
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+  padding: 26px 30px 34px;
+  overflow: hidden;
+}
+
+.bum-h__video {
+  flex: 1 1 72%;
+  min-height: 0;
+  align-self: center;
+  width: 74%;
+}
+
+.bum-h__window {
+  width: 100%;
+  height: 100%;
+}
+
+.bum-h__video {
+  position: relative;
+}
+
+/* Contador N/5 compartido por los dos BUM */
+.bum-counter {
+  position: absolute;
+  top: -14px;
+  right: -18px;
+  z-index: 5;
+  padding: 6px 14px;
+  font-family: var(--font-impact-alt);
+  font-size: 30px;
+  color: var(--bg-cloud-white);
+  background: var(--y2k-magenta);
+  border: 3px solid var(--crt-black);
+  transform: rotate(6deg);
+}
+
+.bum-h__strip {
+  flex: 0 0 24%;
+  min-height: 0;
+  display: grid;
+  grid-template-columns: repeat(5, 1fr);
+  gap: 12px;
+}
+
+.bum-h__cell {
+  min-height: 0;
+  min-width: 0;
+}
+
+.bum-h__cam {
+  width: 100%;
+  height: 100%;
+}

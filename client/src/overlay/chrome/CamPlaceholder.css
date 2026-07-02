@@ -1,0 +1,79 @@
+.cam-placeholder {
+  position: absolute;
+  inset: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  overflow: hidden;
+}
+
+.cam-placeholder__label {
+  font-family: var(--font-impact);
+  font-size: clamp(18px, 3.2vw, 52px);
+  color: var(--bg-cloud-white);
+  background: rgba(13, 13, 13, 0.65);
+  padding: var(--space-2) var(--space-3);
+  transform: rotate(-2deg);
+}
+
+.cam-placeholder__rec {
+  position: absolute;
+  top: 7px;
+  right: 9px;
+  font-family: var(--font-terminal);
+  font-size: 18px;
+  color: var(--y2k-magenta);
+  text-shadow: 1px 1px 0 var(--crt-black);
+}
+
+/* Agujero para cámara real: el filtro Color Key del Browser Source en OBS
+   vuelve transparente este magenta exacto y deja ver la cámara de abajo.
+   Nada semitransparente debería pintarse encima (se keyea a medias). */
+.cam-placeholder--hole {
+  background: var(--obs-key-magenta);
+}
+
+/* Patrones distintivos por cámara (test-card feeling, colores de paleta) */
+.cam-placeholder--tarta {
+  background: conic-gradient(
+    var(--xp-blue-bright) 0deg 60deg,
+    var(--aero-teal) 60deg 120deg,
+    var(--aero-lime) 120deg 180deg,
+    var(--y2k-magenta) 180deg 240deg,
+    var(--y2k-purple) 240deg 300deg,
+    var(--warning-yellow) 300deg 360deg
+  );
+}
+
+.cam-placeholder--rombos {
+  background:
+    repeating-linear-gradient(
+      63deg,
+      var(--y2k-purple) 0 26px,
+      var(--y2k-magenta) 26px 52px
+    );
+}
+
+.cam-placeholder--rayas {
+  background: repeating-linear-gradient(
+    -21deg,
+    var(--aero-teal) 0 22px,
+    var(--xp-blue-deep) 22px 44px,
+    var(--aero-lime) 44px 66px
+  );
+}
+
+.cam-placeholder--puntos {
+  background-color: var(--xp-blue-deep);
+  background-image: radial-gradient(var(--warning-yellow) 6px, transparent 7px);
+  background-size: 38px 38px;
+}
+
+.cam-placeholder--ondas {
+  background: repeating-radial-gradient(
+    circle at 30% 110%,
+    var(--aero-lime) 0 18px,
+    var(--aero-teal) 18px 36px,
+    var(--xp-blue-bright) 36px 54px
+  );
+}

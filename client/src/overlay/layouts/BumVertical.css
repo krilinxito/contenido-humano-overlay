@@ -1,0 +1,58 @@
+.bum-v {
+  display: flex;
+  align-items: stretch;
+  justify-content: center;
+  gap: 18px;
+  padding: 28px 34px 36px;
+  overflow: hidden;
+}
+
+.bum-v__col {
+  flex: 1 1 28%;
+  min-width: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.bum-v__cell {
+  flex: 1;
+  min-height: 0;
+}
+
+.bum-v__cam {
+  width: 100%;
+  height: 100%;
+}
+
+/* Reel 9:16 centrado */
+.bum-v__video {
+  position: relative;
+  flex: 0 0 auto;
+  aspect-ratio: 9 / 16;
+  height: 100%;
+  max-width: 34%;
+}
+
+.bum-v__video .video-placeholder {
+  position: absolute;
+  inset: 0;
+}
+
+.bum-v__doodle {
+  position: absolute;
+  pointer-events: none;
+  z-index: 5;
+}
+
+.bum-v__doodle--1 {
+  top: 6%;
+  left: 32%;
+  transform: rotate(-18deg);
+}
+
+.bum-v__doodle--2 {
+  bottom: 8%;
+  right: 33%;
+  transform: rotate(25deg);
+}
