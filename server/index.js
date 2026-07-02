@@ -55,7 +55,7 @@ io.on('connection', (socket) => {
       console.warn('[socket] cam-rects inválido, ignorado:', payload);
       return;
     }
-    console.log(`[socket] cam-rects (${payload.layout}) → ${payload.rects.length} cams`);
+    console.log(`[socket] cam-rects (${payload.layout}) → ${payload.rects.map((r) => r.cam).join(', ') || 'ninguno'}`);
     applyCamRects(payload);
   });
 

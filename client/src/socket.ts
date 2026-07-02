@@ -1,7 +1,7 @@
 import { io, type Socket } from 'socket.io-client';
 import { useOverlayStore, type GagId, type LayoutId, type PhaseId, type TextKey } from './store/useOverlayStore';
 import type { MemberId } from './config/members';
-import type { CamId } from './config/cams';
+import type { HoleId } from './config/cams';
 import { playSfx } from './overlay/audio';
 
 /** Duración default del countdown de hot topics: 5 minutos. */
@@ -20,9 +20,9 @@ export type TriggerEvent =
   | { type: 'music'; action: 'play' | 'stop'; track?: string }
   | { type: 'music-volume'; volume: number };
 
-/** Rect de una ventana de cámara, normalizado 0..1 sobre el viewport del overlay. */
+/** Rect de una ventana de cámara o pantalla, normalizado 0..1 sobre el viewport del overlay. */
 export interface CamRect {
-  cam: CamId;
+  cam: HoleId;
   x: number;
   y: number;
   w: number;

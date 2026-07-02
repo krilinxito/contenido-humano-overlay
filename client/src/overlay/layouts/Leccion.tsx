@@ -25,6 +25,7 @@ export function Leccion() {
       <ScreenPlusCams
         screenLabel={screenLabel}
         windowTitle={profe ? `leccion_de_${MEMBERS[profe].nombre.toLowerCase()}.ppt` : 'leccion.ppt'}
+        screen={profe ? `screen-${profe}` : 'screen-productor'}
         highlight={profe}
       />
 

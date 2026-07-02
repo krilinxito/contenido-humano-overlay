@@ -11,6 +11,20 @@
     "krilin": "CAM Krilin",
     "general": "CAM General",
     "noticiero": "CAM Noticiero",
-    "plano360": "CAM 360"
-  }
+    "plano360": "CAM 360",
+    "screen-chavez": "NDI Screen Chavez",
+    "screen-aym": "NDI Screen Aym",
+    "screen-mots": "NDI Screen Mots",
+    "screen-darbolis": "NDI Screen Darbolis",
+    "screen-krilin": "NDI Screen Krilin",
+    "screen-productor": "Captura Ventana Productor"
+  },
+  "fit": [
+    "screen-chavez",
+    "screen-aym",
+    "screen-mots",
+    "screen-darbolis",
+    "screen-krilin",
+    "screen-productor"
+  ]
 }

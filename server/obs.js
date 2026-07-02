@@ -40,6 +40,13 @@ function loadConfig() {
 const config = loadConfig();
 const obs = new OBSWebSocket();
 
+/** Ids que se ajustan con "fit" (SCALE_INNER, sin recortar) en vez de "cover" —
+ *  pensado para pantallas compartidas, donde recortar se come contenido. */
+const fitIds = new Set(config?.fit ?? []);
+/** Ids de pantalla configurados: comparten agujero, así que hay que estacionar
+ *  las ausentes (ver applyCamRects). */
+const screenIds = config ? Object.keys(config.sources).filter((id) => id.startsWith('screen-')) : [];
+
 let connected = false;
 let base = { width: 1920, height: 1080 };
 /** camId -> sceneItemId dentro de config.scene (se resuelve al conectar). */
@@ -125,14 +132,39 @@ obs.on('ConnectionClosed', () => {
  * Aplica los rects reportados por el overlay: posiciona cada fuente de cámara
  * detrás de su agujero. Las cámaras nunca se ocultan (el overlay opaco las
  * tapa cuando el layout no las muestra) — así no parpadean entre layouts.
+ *
+ * Las pantallas (`screen-*`) son la excepción: todas comparten EL MISMO
+ * agujero, así que la que quedó de antes taparía a la nueva según el z-order.
+ * Las ausentes del payload se estacionan fuera del canvas (sin
+ * SetSceneItemEnabled, es el mismo mecanismo de transform).
  */
 export function applyCamRects(payload) {
   if (!config) return;
   lastPayload = payload;
   if (!connected) return;
 
+  const present = new Set(payload.rects.map((r) => r.cam));
   for (const rect of payload.rects) {
     moveCam(rect);
+  }
+  for (const screenId of screenIds) {
+    if (!present.has(screenId)) parkScreen(screenId);
+  }
+}
+
+/** Manda una pantalla no usada fuera del canvas (a la derecha, sin escalar). */
+async function parkScreen(screenId) {
+  const sceneItemId = itemIds.get(screenId) ?? (await resolveItemId(screenId));
+  if (sceneItemId === undefined) return;
+  try {
+    await obs.call('SetSceneItemTransform', {
+      sceneName: config.scene,
+      sceneItemId,
+      sceneItemTransform: { positionX: base.width * 2, positionY: 0, alignment: 5 },
+    });
+  } catch (err) {
+    itemIds.delete(screenId);
+    console.warn(`[obs] no pude estacionar la pantalla "${screenId}": ${err.message}`);
   }
 }
 
@@ -151,7 +183,9 @@ async function moveCam(rect) {
         // SCALE_OUTER = "cover": llena el box conservando aspecto. Sin
         // cropToBounds el desborde se escaparía por los agujeros VECINOS
         // (el overlay lo tapa, pero los otros marcos también son agujeros).
-        boundsType: 'OBS_BOUNDS_SCALE_OUTER',
+        // Los ids en config.fit (pantallas) usan SCALE_INNER = "fit": se ve
+        // todo el contenido aunque quede franja (poner un fondo sólido debajo).
+        boundsType: fitIds.has(rect.cam) ? 'OBS_BOUNDS_SCALE_INNER' : 'OBS_BOUNDS_SCALE_OUTER',
         boundsAlignment: 0,
         boundsWidth: Math.max(1, rect.w * base.width),
         boundsHeight: Math.max(1, rect.h * base.height),

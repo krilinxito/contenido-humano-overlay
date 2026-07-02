@@ -72,6 +72,15 @@ Objetivo: que las cámaras se vean **dentro** de los marcos del overlay, con el 
 - La integración obs-websocket vive **solo en `server/obs.js`** — el overlay únicamente reporta rects; el client jamás importa obs-websocket-js.
 - Cams especiales (`general`, `noticiero`, `plano360`) se mapean a fuentes reales en `server/obs-config.json`; varias pueden apuntar a la misma fuente física.
 
+**Pantallas compartidas (`screen-*`):**
+
+El mismo mecanismo cubre las pantallas: `obs.js` es **agnóstico al tipo de fuente** (solo hace `GetSceneItemId` por nombre + `SetSceneItemTransform`), así que da igual que la fuente sea una webcam USB, una **NDI** (pantalla de un miembro remoto) o una **captura de ventana** (pantalla del productor en la PC del stream). No se declara el tipo en ningún lado: solo el nombre de la source en `obs-config.json`.
+
+- Ids: `screen-chavez` … `screen-krilin` (NDI de cada miembro) + `screen-productor` (`ScreenId` en `client/src/config/cams.ts`; `HoleId = CamId | ScreenId` es lo que viaja en `cam-rects`).
+- `ScreenPlaceholder` acepta prop `screen?: ScreenId` y en `?cams=real` se vuelve agujero magenta, igual que `CamPlaceholder`. Los layouts con pantalla (Lección, CamsPantalla, PPT) derivan el id de `activeMember` (fallback `screen-productor`); Tema usa `screen-productor` fijo. Cambiar quién comparte = `set-member` desde el panel, sin tocar OBS.
+- **Fit, no cover**: los ids listados en `"fit"` de `obs-config.json` usan `OBS_BOUNDS_SCALE_INNER` (se ve todo el contenido; recortar una PPT se come texto). Si el aspecto no coincide queda franja — conviene una source de color sólido justo debajo de las pantallas en OBS. Las cams siguen con cover.
+- **Excepción a "nunca se ocultan"**: las 6 sources de pantalla comparten **el mismo agujero**, así que la anterior taparía a la nueva según el z-order. Las `screen-*` ausentes del payload se **estacionan fuera del canvas** (transform con `positionX` fuera de pantalla — sin `SetSceneItemEnabled`). El costo es el mismo salto seco de ~300ms ya aceptado en transiciones.
+
 ## Audio (soundboard + jukebox)
 
 El audio del show lo reproduce **el overlay dentro de OBS**, nunca el panel: el audio de un Browser Source entra directo al mezclador de OBS, mientras que el panel corre en el navegador del productor (posiblemente en otra máquina) y sonaría ahí. El flujo es el estándar: panel → `sfx`/`music`/`music-volume` → overlay.

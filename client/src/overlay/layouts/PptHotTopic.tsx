@@ -30,7 +30,10 @@ export function PptHotTopic() {
           title="presentacion_final_v3_DEFINITIVA(1).ppt — PowerPoint"
           className="ppt__window"
         >
-          <ScreenPlaceholder label={nombre ? `PPT TRUCHO DE ${nombre}` : 'PPT TRUCHO'} />
+          <ScreenPlaceholder
+            label={nombre ? `PPT TRUCHO DE ${nombre}` : 'PPT TRUCHO'}
+            screen={presenter ? `screen-${presenter}` : 'screen-productor'}
+          />
         </XPWindow>
         <motion.div
           className="ppt__tema"

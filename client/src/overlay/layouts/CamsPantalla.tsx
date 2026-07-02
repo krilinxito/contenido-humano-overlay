@@ -22,7 +22,12 @@ export function CamsPantalla() {
       animate={{ opacity: 1, x: 0, scale: 1, transition: SPRING_TORPE }}
       exit={{ opacity: 0, x: '-5%', transition: CORTE_BRUSCO }}
     >
-      <ScreenPlusCams screenLabel={screenLabel} windowTitle={windowTitle} highlight={member} />
+      <ScreenPlusCams
+        screenLabel={screenLabel}
+        windowTitle={windowTitle}
+        screen={member ? `screen-${member}` : 'screen-productor'}
+        highlight={member}
+      />
     </motion.div>
   );
 }

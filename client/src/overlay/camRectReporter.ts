@@ -10,15 +10,15 @@
 
 import { emitCamRects, getSocket, type CamRect } from '../socket';
 import { useOverlayStore } from '../store/useOverlayStore';
-import type { CamId } from '../config/cams';
+import type { HoleId } from '../config/cams';
 
 /** Leído UNA vez al arrancar, igual que `?layout=` — sin navegación. */
 export const CAMS_REAL = new URLSearchParams(window.location.search).get('cams') === 'real';
 
-const registry = new Map<HTMLElement, CamId>();
+const registry = new Map<HTMLElement, HoleId>();
 
-/** Registra el elemento-agujero de una cam. Devuelve el cleanup. */
-export function registerCamHole(el: HTMLElement, cam: CamId): () => void {
+/** Registra el elemento-agujero de una cam o pantalla. Devuelve el cleanup. */
+export function registerCamHole(el: HTMLElement, cam: HoleId): () => void {
   registry.set(el, cam);
   return () => {
     registry.delete(el);

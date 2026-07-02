@@ -15,7 +15,11 @@ export function Tema() {
       animate={{ opacity: 1, y: 0, scale: 1, transition: SPRING_TORPE }}
       exit={{ opacity: 0, y: '5%', transition: CORTE_BRUSCO }}
     >
-      <ScreenPlusCams screenLabel="VISUALES DEL TEMA" windowTitle="tema_de_hoy_v4_AHORA_SI.mp4" />
+      <ScreenPlusCams
+        screenLabel="VISUALES DEL TEMA"
+        windowTitle="tema_de_hoy_v4_AHORA_SI.mp4"
+        screen="screen-productor"
+      />
 
       <motion.div
         className="tema__titulo bevel-out"

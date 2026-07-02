@@ -1,5 +1,6 @@
 import type { ReactNode } from 'react';
 import { MEMBER_IDS, type MemberId } from '../../config/members';
+import type { ScreenId } from '../../config/cams';
 import { XPWindow } from '../chrome/XPWindow';
 import { ScreenPlaceholder } from '../chrome/ScreenPlaceholder';
 import { CamCell } from '../chrome/CamCell';
@@ -10,6 +11,8 @@ interface ScreenPlusCamsProps {
   screenLabel: string;
   /** Título de la ventana XP de la pantalla. */
   windowTitle: string;
+  /** Pantalla real que va en el hueco (modo `?cams=real`). */
+  screen?: ScreenId;
   /** Miembro resaltado en el strip de cams (borde de su color). */
   highlight?: MemberId | null;
   /** Contenido extra sobre la pantalla (títulos, timer, doodles). */
@@ -21,12 +24,12 @@ interface ScreenPlusCamsProps {
  * + strip vertical con las 5 cams de la plebe (CamCell). La usan Lección,
  * Tema y CamsPantalla. Ver docs/COMPONENT_PATTERNS.md.
  */
-export function ScreenPlusCams({ screenLabel, windowTitle, highlight = null, children }: ScreenPlusCamsProps) {
+export function ScreenPlusCams({ screenLabel, windowTitle, screen, highlight = null, children }: ScreenPlusCamsProps) {
   return (
     <div className="screen-plus-cams">
       <div className="screen-plus-cams__screen">
         <XPWindow title={windowTitle} className="screen-plus-cams__window">
-          <ScreenPlaceholder label={screenLabel} />
+          <ScreenPlaceholder label={screenLabel} screen={screen} />
           {children}
         </XPWindow>
       </div>

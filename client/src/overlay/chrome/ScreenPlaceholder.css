@@ -17,6 +17,12 @@
     linear-gradient(137deg, var(--xp-blue-deep) 0%, var(--xp-blue-bright) 58%, var(--aero-teal) 100%);
 }
 
+/* Modo cámaras reales: magenta llave puro, sin patrón ni nada semitransparente
+   encima (regla de docs/ARCHITECTURE.md — el Color Key lo vuelve transparente). */
+.screen-placeholder--hole {
+  background: var(--obs-key-magenta);
+}
+
 .screen-placeholder__icon {
   font-size: clamp(34px, 5vw, 80px);
 }

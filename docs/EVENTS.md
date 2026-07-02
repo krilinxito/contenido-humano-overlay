@@ -64,14 +64,16 @@ Mismo payload `TriggerEvent` que `trigger`. El server no transforma nada, solo r
 
 ### `cam-rects` (Overlay → Server, **no se re-emite**)
 
-Solo lo manda la instancia del overlay que corre con `?cams=real` (la Browser Source de OBS — **una sola**, ver PRODUCCION.md). Reporta dónde quedaron los agujeros de cámara del layout actual para que el server posicione las fuentes reales de OBS detrás del overlay (modo cámaras reales, ver ARCHITECTURE.md).
+Solo lo manda la instancia del overlay que corre con `?cams=real` (la Browser Source de OBS — **una sola**, ver PRODUCCION.md). Reporta dónde quedaron los agujeros de cámara **y de pantalla compartida** del layout actual para que el server posicione las fuentes reales de OBS detrás del overlay (modo cámaras reales, ver ARCHITECTURE.md).
 
 ```ts
 interface CamRectsPayload {
   layout: LayoutId;
   rects: Array<{
-    cam: CamId; // MemberId | 'general' | 'noticiero' | 'plano360' (client/src/config/cams.ts)
-    x: number;  // rect normalizado 0..1 sobre el viewport del overlay
+    cam: HoleId; // CamId (MemberId | 'general' | 'noticiero' | 'plano360')
+                 // | ScreenId ('screen-<MemberId>' | 'screen-productor')
+                 // (client/src/config/cams.ts)
+    x: number;   // rect normalizado 0..1 sobre el viewport del overlay
     y: number;
     w: number;
     h: number;
