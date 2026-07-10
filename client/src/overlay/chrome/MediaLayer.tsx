@@ -2,6 +2,7 @@ import { useEffect, useRef } from 'react';
 import { AnimatePresence, motion } from 'framer-motion';
 import { useOverlayStore } from '../../store/useOverlayStore';
 import { resolveMediaUrl } from '../../socket';
+import { retryOnFirstInteraction } from '../audio';
 import { SPRING_TORPE, CORTE_BRUSCO } from '../motionPresets';
 import './MediaLayer.css';
 
@@ -47,17 +48,22 @@ function MediaVideo({ url, volume }: { url: string; volume: number }) {
   }, [volume]);
 
   // Autoplay con sonido: dentro de OBS siempre anda, pero un navegador normal
-  // lo BLOQUEA si no hubo click previo en la página ("a veces se reproduce y
-  // a veces no"). Fallback: si el play() con audio falla, se reproduce
-  // muteado — mejor meme sin sonido que ventana congelada. (Igual que el
-  // audio del jukebox: en previews de navegador, click en la página primero.)
+  // lo BLOQUEA si no hubo click previo en la página. Fallback: se reproduce
+  // muteado (mejor meme sin sonido que ventana congelada) y al primer
+  // click/tecla en la página recupera el sonido solo (overlay/audio.ts).
   useEffect(() => {
     const video = ref.current;
     if (!video) return;
-    video.play().catch(() => {
+    video.play().catch((err: DOMException) => {
+      console.warn(`[audio] video con sonido bloqueado (${err.name}) — fallback muteado`);
       video.muted = true;
-      video.play().catch(() => {
-        /* sin video posible (códec no soportado, ej. .mov raro) */
+      video.play().catch((e: DOMException) => {
+        console.warn(`[audio] video ni muteado pudo (${e.name}) — ¿códec no soportado? (ej. .mov raro)`);
+      });
+      retryOnFirstInteraction(() => {
+        if (!video.isConnected) return; // el meme ya se ocultó
+        video.muted = false;
+        video.play().catch((e: DOMException) => console.warn(`[audio] video sigue sin sonido: ${e.name}`));
       });
     });
   }, [url]);

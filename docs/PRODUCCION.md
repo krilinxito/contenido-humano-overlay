@@ -39,7 +39,7 @@ Prueba rápida sin salir al aire: con OBS y el server corriendo, cambiar layouts
 
 - Por el Browser Source del overlay sale TODO el audio del show que dispara el panel (SFX + música). Por default suena por los parlantes de la PC y entra al stream vía "Audio del escritorio"; **recomendado**: activar "Controlar el audio desde OBS" en las propiedades de la fuente para que aparezca como canal propio **"Overlay"** en el mezclador (nivel independiente, y no depende del audio del escritorio ni suena por los parlantes salvo que actives monitoreo). El volumen fino de la música se maneja con el slider del panel.
 - **No abrir el overlay (`/` con o sin `?cams=real`) en ningún otro navegador durante el show**: cada instancia extra reproduce el audio también (doble bocina). El panel no suena.
-- El autoplay funciona solo dentro de OBS; si probás el overlay en un navegador normal, hacé un click en la página antes o el navegador bloquea el audio.
+- El autoplay con sonido funciona solo dentro de OBS. En un navegador normal el audio queda bloqueado hasta el **primer click/tecla en la página**: al primer gesto, la música y los videos de memes (que arrancan muteados) recuperan el sonido solos (`retryOnFirstInteraction`, `overlay/audio.ts`). Los SFX one-shot bloqueados no se recuperan (reproducirlos tarde sería peor) — disparalos de nuevo después del click.
 
 ## Chat real de Kick
 

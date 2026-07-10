@@ -1,6 +1,7 @@
 import { useEffect, useRef } from 'react';
 import { useOverlayStore } from '../../store/useOverlayStore';
 import { MUSIC_TRACKS } from '../../config/sounds';
+import { retryOnFirstInteraction } from '../audio';
 
 /**
  * Reproductor headless de música (no renderiza nada). Vive en OverlayApp
@@ -23,8 +24,15 @@ export function Jukebox() {
     const audio = new Audio(def.url);
     audio.loop = true;
     audio.volume = useOverlayStore.getState().musicVolume;
-    audio.play().catch(() => {
-      // Autoplay bloqueado: solo en navegador normal sin click previo; en OBS no pasa.
+    audio.play().catch((err: DOMException) => {
+      // Autoplay bloqueado (navegador normal sin click previo; en OBS no
+      // pasa): la música arranca sola al primer click en la página — si el
+      // track sigue siendo este (el guard evita resucitar audios viejos).
+      console.warn(`[audio] música "${track}" no arrancó: ${err.name} — reintento al primer click`);
+      retryOnFirstInteraction(() => {
+        if (audioRef.current === audio)
+          audio.play().catch((e: DOMException) => console.warn(`[audio] música "${track}" sigue bloqueada: ${e.name}`));
+      });
     });
     audioRef.current = audio;
     return () => {
