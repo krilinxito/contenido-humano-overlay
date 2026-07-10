@@ -1,11 +1,15 @@
 import { useEffect, useState } from 'react';
-import { emitTrigger, getSocket, DEFAULT_TIMER_MS } from '../socket';
+import { emitTrigger, getSocket, resolveMediaUrl, DEFAULT_TIMER_MS, SOCKET_URL } from '../socket';
 import {
   DEFAULT_TEXTS,
+  DEFAULT_MEDIA,
+  PALETTES,
   type LayoutId,
   type GagId,
   type PhaseId,
   type TextKey,
+  type MediaPosition,
+  type PaletteId,
 } from '../store/useOverlayStore';
 import { MEMBERS, MEMBER_IDS, type MemberId } from '../config/members';
 import { SFX_SOUNDS, MUSIC_TRACKS } from '../config/sounds';
@@ -54,16 +58,89 @@ const PHASES: { id: PhaseId; label: string }[] = [
   { id: 'bum', label: 'B.U.M.' },
 ];
 
+// Los de uso frecuente van siempre visibles; el resto agrupado en <details>.
 const TEXT_FIELDS: { key: TextKey; label: string }[] = [
   { key: 'tema', label: 'Tema' },
   { key: 'zocalo', label: 'Zócalo' },
   { key: 'ticker', label: 'Ticker' },
   { key: 'penitencia', label: 'Penitencia' },
-  { key: 'intro-marquee', label: 'Marquee intro' },
-  { key: 'brb-sub', label: 'BRB' },
+];
+
+const TEXT_GROUPS: { label: string; fields: { key: TextKey; label: string }[] }[] = [
+  {
+    label: '👤 Nombres',
+    fields: MEMBER_IDS.map((id) => ({ key: `nombre-${id}` as TextKey, label: MEMBERS[id].nombre })),
+  },
+  {
+    label: '🎬 Intro / BRB / Outro',
+    fields: [
+      { key: 'intro-marquee', label: 'Marquee intro' },
+      { key: 'eslogan', label: 'Eslogan' },
+      { key: 'brb-title', label: 'BRB título' },
+      { key: 'brb-sub', label: 'BRB subtítulo' },
+      { key: 'outro-titulo', label: 'Outro título' },
+      { key: 'outro-sub', label: 'Outro subtítulo' },
+      { key: 'outro-gracias', label: 'Outro gracias' },
+      { key: 'outro-marquee', label: 'Outro marquee' },
+    ],
+  },
+  {
+    label: '💡 Tema / Lección / PPT',
+    fields: [
+      { key: 'tema-label', label: 'Cartel tema' },
+      { key: 'tema-window', label: 'Ventana tema' },
+      { key: 'leccion-label', label: 'Cartel lección' },
+      { key: 'ppt-window', label: 'Ventana PPT' },
+      { key: 'ppt-timer-label', label: 'Label timer' },
+    ],
+  },
+  {
+    label: '🥊 Tertulia / Debate / Papeado / Penitencia',
+    fields: [
+      { key: 'tertulia-pick', label: '¿Quién empieza?' },
+      { key: 'debate-banner', label: 'Banner debate' },
+      { key: 'debate-vs', label: 'VS' },
+      { key: 'papeado-titulo', label: 'Título papeado' },
+      { key: 'papeado-redoble', label: 'Redoble' },
+      { key: 'papeado-sello', label: 'Sello' },
+      { key: 'papeado-label', label: 'Label penitencia' },
+      { key: 'penitencia-pick', label: '¿Quién paga?' },
+      { key: 'penitencia-label', label: 'Label cumpliendo' },
+      { key: 'penitencia-testigos', label: 'Label testigos' },
+    ],
+  },
+  {
+    label: '🪟 Ventanas y varios',
+    fields: [
+      { key: 'window-chat', label: 'Ventana chat' },
+      { key: 'window-set', label: 'Ventana set' },
+      { key: 'window-plano-general', label: 'Ventana plano gral.' },
+      { key: 'plano360-label', label: 'Cartel 360' },
+      { key: 'noticiero-tag', label: 'Tag noticiero' },
+    ],
+  },
 ];
 
 const PENITENCIAS_RAPIDAS = ['palomo cojo', 'sardina coja'];
+
+// ---- Memes (sección MEMES, evento `media` — ver docs/EVENTS.md) ----
+
+interface MediaItem {
+  name: string;
+  url: string;
+  kind: 'image' | 'video';
+}
+
+/** Para URLs pegadas a mano: extensión de video conocida → video, si no imagen. */
+const VIDEO_URL_RE = /\.(mp4|webm|mov|mkv)($|\?)/i;
+
+const MEDIA_POSITIONS: { id: MediaPosition; label: string }[] = [
+  { id: 'tl', label: '↖' },
+  { id: 'tr', label: '↗' },
+  { id: 'center', label: '▣' },
+  { id: 'bl', label: '↙' },
+  { id: 'br', label: '↘' },
+];
 
 /** Consola del productor (ruta /panel). Corre fuera de OBS, puede recargar. */
 export function PanelApp() {
@@ -76,6 +153,14 @@ export function PanelApp() {
   const [texts, setTexts] = useState<Record<TextKey, string>>({ ...DEFAULT_TEXTS });
   const [musicTrack, setMusicTrack] = useState<string | null>(null);
   const [musicVol, setMusicVol] = useState(0.5);
+  const [palette, setPalette] = useState<PaletteId>('default');
+  const [donaNombre, setDonaNombre] = useState('');
+  const [donaMonto, setDonaMonto] = useState('');
+  const [gallery, setGallery] = useState<MediaItem[]>([]);
+  const [mediaUrl, setMediaUrl] = useState('');
+  const [mediaShown, setMediaShown] = useState<string | null>(null);
+  const [media, setMedia] = useState({ ...DEFAULT_MEDIA });
+  const [uploading, setUploading] = useState(false);
 
   useEffect(() => {
     const s = getSocket();
@@ -142,6 +227,83 @@ export function PanelApp() {
     setLastSent(`música vol → ${Math.round(volume * 100)}%`);
   };
 
+  // Mock de donaciones (botón manual): el sapo anunciador dice el texto.
+  // La fuente real (Kicks/Streamlabs) llamará lo mismo desde el server.
+  const sendDonacion = () => {
+    if (!donaNombre.trim() || !donaMonto.trim()) return;
+    emitTrigger({ type: 'gag', gag: 'sapo-random', text: `¡${donaNombre.trim()} tiró ${donaMonto.trim()}!` });
+    if (SFX_SOUNDS.some((s) => s.id === 'celebrate')) emitTrigger({ type: 'sfx', id: 'celebrate' });
+    setLastSent(`donación → ${donaNombre.trim()} (${donaMonto.trim()})`);
+    setDonaNombre('');
+    setDonaMonto('');
+  };
+
+  const sendPalette = (p: PaletteId) => {
+    emitTrigger({ type: 'set-palette', palette: p });
+    setPalette(p);
+    setLastSent(`paleta → ${p}`);
+  };
+
+  // ---- Memes ----
+
+  const refreshGallery = () => {
+    fetch(`${SOCKET_URL}/api/media`)
+      .then((r) => r.json())
+      .then(setGallery)
+      .catch(() => setGallery([]));
+  };
+  useEffect(refreshGallery, []);
+
+  const sendMediaShow = (url: string, kind: 'image' | 'video') => {
+    emitTrigger({ type: 'media', action: 'show', url, kind, ...media });
+    setMediaShown(url);
+    setLastSent(`meme → ${url.split('/').pop()?.slice(0, 30)}`);
+  };
+
+  const sendMediaPatch = (patch: Partial<typeof media>) => {
+    setMedia((m) => ({ ...m, ...patch }));
+    emitTrigger({ type: 'media', action: 'update', ...patch });
+  };
+
+  const sendMediaHide = () => {
+    emitTrigger({ type: 'media', action: 'hide' });
+    setMediaShown(null);
+    setLastSent('meme → oculto');
+  };
+
+  const deleteMedia = async (item: MediaItem) => {
+    // Si el que se borra está al aire, primero se saca de pantalla.
+    if (mediaShown === item.url) sendMediaHide();
+    try {
+      const res = await fetch(`${SOCKET_URL}/api${item.url}`, { method: 'DELETE' });
+      if (!res.ok) throw new Error(`HTTP ${res.status}`);
+      setLastSent(`meme borrado → ${item.name.slice(0, 30)}`);
+    } catch {
+      setLastSent('no pude borrar: ¿server caído?');
+    }
+    refreshGallery();
+  };
+
+  const uploadMedia = async (file: File) => {
+    setUploading(true);
+    try {
+      const body = new FormData();
+      body.append('file', file);
+      const res = await fetch(`${SOCKET_URL}/api/media`, { method: 'POST', body });
+      const data = (await res.json()) as { url?: string; error?: string };
+      if (!data.url) {
+        setLastSent(`upload falló: ${data.error ?? res.status}`);
+        return;
+      }
+      refreshGallery();
+      sendMediaShow(data.url, file.type.startsWith('video/') ? 'video' : 'image');
+    } catch {
+      setLastSent('upload falló: ¿server caído?');
+    } finally {
+      setUploading(false);
+    }
+  };
+
   const applyText = (key: TextKey, value?: string) => {
     const text = value ?? texts[key];
     if (value !== undefined) setTexts((t) => ({ ...t, [key]: value }));
@@ -154,6 +316,29 @@ export function PanelApp() {
     emitTrigger({ type: 'set-text', key, text: DEFAULT_TEXTS[key] });
     setLastSent(`texto ${key} → default`);
   };
+
+  // Función render (no componente): un componente definido acá adentro se
+  // remonta en cada render y el input pierde el foco al tipear.
+  const renderTextRow = (key: TextKey, label: string) => (
+    <div key={key} className="panel__text-row">
+      <label className="panel__text-label">{label}</label>
+      <input
+        className="panel__input bevel-in"
+        type="text"
+        value={texts[key]}
+        onChange={(e) => setTexts((t) => ({ ...t, [key]: e.target.value }))}
+        onKeyDown={(e) => {
+          if (e.key === 'Enter') applyText(key);
+        }}
+      />
+      <button className="panel__mini" title="aplicar" onClick={() => applyText(key)}>
+        ✓
+      </button>
+      <button className="panel__mini" title="volver al default" onClick={() => resetText(key)}>
+        ↺
+      </button>
+    </div>
+  );
 
   return (
     <div className="panel">
@@ -273,6 +458,48 @@ export function PanelApp() {
                 ))}
               </div>
             </section>
+
+            <section className="panel__group bevel-out">
+              <span className="panel__group-label">DONACIÓN</span>
+              <div className="panel__row">
+                <input
+                  className="panel__input bevel-in panel__input--dona"
+                  type="text"
+                  placeholder="nombre"
+                  value={donaNombre}
+                  onChange={(e) => setDonaNombre(e.target.value)}
+                  onKeyDown={(e) => e.key === 'Enter' && sendDonacion()}
+                />
+                <input
+                  className="panel__input bevel-in panel__input--dona"
+                  type="text"
+                  placeholder="monto"
+                  value={donaMonto}
+                  onChange={(e) => setDonaMonto(e.target.value)}
+                  onKeyDown={(e) => e.key === 'Enter' && sendDonacion()}
+                />
+                <button className="panel__chip panel__chip--gag" title="el sapo lo anuncia" onClick={sendDonacion}>
+                  🐸 ANUNCIAR
+                </button>
+              </div>
+            </section>
+
+            <section className="panel__group bevel-out">
+              <span className="panel__group-label">PALETA</span>
+              <div className="panel__row">
+                <select
+                  className="panel__select bevel-in"
+                  value={palette}
+                  onChange={(e) => sendPalette(e.target.value as PaletteId)}
+                >
+                  {PALETTES.map((p) => (
+                    <option key={p.id} value={p.id}>
+                      {p.label}
+                    </option>
+                  ))}
+                </select>
+              </div>
+            </section>
           </div>
 
           <div className="panel__group-row">
@@ -322,27 +549,123 @@ export function PanelApp() {
           </div>
 
           <section className="panel__group bevel-out">
-            <span className="panel__group-label">TEXTOS EN PANTALLA</span>
-            {TEXT_FIELDS.map(({ key, label }) => (
-              <div key={key} className="panel__text-row">
-                <label className="panel__text-label">{label}</label>
+            <span className="panel__group-label">MEMES</span>
+            <div className="panel__row">
+              <label className={`panel__chip panel__upload ${uploading ? 'panel__upload--busy' : ''}`}>
+                📤 {uploading ? 'SUBIENDO…' : 'SUBIR'}
                 <input
-                  className="panel__input bevel-in"
-                  type="text"
-                  value={texts[key]}
-                  onChange={(e) => setTexts((t) => ({ ...t, [key]: e.target.value }))}
-                  onKeyDown={(e) => {
-                    if (e.key === 'Enter') applyText(key);
+                  type="file"
+                  accept="image/*,video/*"
+                  onChange={(e) => {
+                    const file = e.target.files?.[0];
+                    if (file) void uploadMedia(file);
+                    e.target.value = ''; // permite re-subir el mismo archivo
                   }}
                 />
-                <button className="panel__mini" title="aplicar" onClick={() => applyText(key)}>
-                  ✓
+              </label>
+              <input
+                className="panel__input bevel-in"
+                type="text"
+                placeholder="…o pegá una URL (imagen/video)"
+                value={mediaUrl}
+                onChange={(e) => setMediaUrl(e.target.value)}
+                onKeyDown={(e) => {
+                  if (e.key === 'Enter' && mediaUrl.trim())
+                    sendMediaShow(mediaUrl.trim(), VIDEO_URL_RE.test(mediaUrl) ? 'video' : 'image');
+                }}
+              />
+              <button
+                className="panel__mini"
+                title="mostrar URL"
+                onClick={() =>
+                  mediaUrl.trim() && sendMediaShow(mediaUrl.trim(), VIDEO_URL_RE.test(mediaUrl) ? 'video' : 'image')
+                }
+              >
+                ✓
+              </button>
+              <button className="panel__chip panel__chip--timer" onClick={sendMediaHide}>
+                OCULTAR
+              </button>
+            </div>
+            <div className="panel__row panel__gallery">
+              {gallery.map((item) => (
+                <div key={item.url} className="panel__thumb-wrap">
+                  <button
+                    className={`panel__thumb bevel-out ${mediaShown === item.url ? 'panel__thumb--active' : ''}`}
+                    title={item.name}
+                    onClick={() => sendMediaShow(item.url, item.kind)}
+                  >
+                    {item.kind === 'image' ? (
+                      <img src={resolveMediaUrl(item.url)} alt={item.name} />
+                    ) : (
+                      <span className="panel__thumb-video">🎞</span>
+                    )}
+                    <span className="panel__thumb-name">{item.name}</span>
+                  </button>
+                  <button
+                    className="panel__thumb-del"
+                    title="borrar del server"
+                    onClick={() => void deleteMedia(item)}
+                  >
+                    ✕
+                  </button>
+                </div>
+              ))}
+              {gallery.length === 0 && <span className="panel__hint">subí un meme y queda en la galería</span>}
+            </div>
+            <div className="panel__row">
+              {MEDIA_POSITIONS.map((p) => (
+                <button
+                  key={p.id}
+                  className={`panel__chip panel__chip--num ${media.position === p.id ? 'panel__chip--active' : ''}`}
+                  title={`posición ${p.id}`}
+                  onClick={() => sendMediaPatch({ position: p.id })}
+                >
+                  {p.label}
                 </button>
-                <button className="panel__mini" title="volver al default" onClick={() => resetText(key)}>
-                  ↺
-                </button>
-              </div>
-            ))}
+              ))}
+              <label className="panel__slider-label" title="tamaño (% del ancho)">
+                📏
+                <input
+                  className="panel__slider"
+                  type="range"
+                  min={10}
+                  max={100}
+                  value={Math.round(media.scale * 100)}
+                  onChange={(e) => sendMediaPatch({ scale: Number(e.target.value) / 100 })}
+                />
+              </label>
+              <label
+                className="panel__slider-label"
+                title="opacidad — ojo: <100% sobre un agujero de cámara glitchea el key"
+              >
+                👻
+                <input
+                  className="panel__slider"
+                  type="range"
+                  min={10}
+                  max={100}
+                  value={Math.round(media.opacity * 100)}
+                  onChange={(e) => sendMediaPatch({ opacity: Number(e.target.value) / 100 })}
+                />
+              </label>
+              <label className="panel__slider-label" title="volumen (solo video)">
+                🔊
+                <input
+                  className="panel__slider"
+                  type="range"
+                  min={0}
+                  max={100}
+                  value={Math.round(media.volume * 100)}
+                  onChange={(e) => sendMediaPatch({ volume: Number(e.target.value) / 100 })}
+                />
+              </label>
+            </div>
+          </section>
+
+          <section className="panel__group bevel-out">
+            <span className="panel__group-label">TEXTOS EN PANTALLA</span>
+            {TEXT_FIELDS.map(({ key, label }) => renderTextRow(key, label))}
             <div className="panel__row panel__quick">
               {PENITENCIAS_RAPIDAS.map((p) => (
                 <button key={p} className="panel__chip" onClick={() => applyText('penitencia', p)}>
@@ -350,6 +673,12 @@ export function PanelApp() {
                 </button>
               ))}
             </div>
+            {TEXT_GROUPS.map((group) => (
+              <details key={group.label} className="panel__details">
+                <summary className="panel__details-summary">{group.label}</summary>
+                {group.fields.map(({ key, label }) => renderTextRow(key, label))}
+              </details>
+            ))}
           </section>
         </main>
       </div>

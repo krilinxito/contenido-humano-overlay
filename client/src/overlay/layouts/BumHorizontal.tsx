@@ -1,7 +1,7 @@
 import { motion } from 'framer-motion';
 import { SPRING_TORPE, CORTE_BRUSCO } from '../motionPresets';
-import { useOverlayStore } from '../../store/useOverlayStore';
-import { MEMBERS, MEMBER_IDS } from '../../config/members';
+import { useOverlayStore, getMemberName } from '../../store/useOverlayStore';
+import { MEMBER_IDS } from '../../config/members';
 import { XPWindow } from '../chrome/XPWindow';
 import { VideoPlaceholder } from '../chrome/VideoPlaceholder';
 import { CamCell } from '../chrome/CamCell';
@@ -15,9 +15,10 @@ import './BumHorizontal.css';
 export function BumHorizontal() {
   const dueno = useOverlayStore((s) => s.activeMember);
   const bumIndex = useOverlayStore((s) => s.bumIndex);
-  const label = dueno ? `VIDEO ${bumIndex}/5 DE ${MEMBERS[dueno].nombre}` : 'VIDEO DE LA SEMANA';
-  const windowTitle = dueno
-    ? `bum_${MEMBERS[dueno].nombre.toLowerCase()}_${bumIndex}de5.mp4 - Reproductor`
+  const nombre = useOverlayStore((s) => (s.activeMember ? getMemberName(s.texts, s.activeMember) : null));
+  const label = nombre ? `VIDEO ${bumIndex}/5 DE ${nombre}` : 'VIDEO DE LA SEMANA';
+  const windowTitle = nombre
+    ? `bum_${nombre.toLowerCase()}_${bumIndex}de5.mp4 - Reproductor`
     : 'reel_que_vio_la_gente (34) - Reproductor';
 
   return (
@@ -33,7 +34,7 @@ export function BumHorizontal() {
         animate={{ scale: 1, rotate: -0.4, transition: SPRING_TORPE }}
       >
         <XPWindow title={windowTitle} className="bum-h__window">
-          <VideoPlaceholder label={label} />
+          <VideoPlaceholder label={label} screen="screen-bum" />
         </XPWindow>
         {dueno && <span className="bum-counter sticker">{bumIndex}/5</span>}
       </motion.div>

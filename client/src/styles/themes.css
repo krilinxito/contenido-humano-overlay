@@ -1,0 +1,58 @@
+/* ============================================================
+   themes.css — paletas alternativas del overlay (evento `set-palette`).
+   Overrides de los tokens de tokens.css bajo [data-palette="<id>"] en
+   <html> (lo aplica OverlayApp). La paleta default son los tokens tal
+   cual (sin atributo). Documentación y criterio: docs/DESIGN_SYSTEM.md,
+   sección "Paletas".
+
+   REGLAS:
+   - --obs-key-magenta JAMÁS se overridea (es el color llave de OBS).
+   - Los colores que viven en JS (acentos de members.ts, materiales 3D)
+     NO cambian con la paleta — solo el escenario CSS.
+   - Los --skin-* tampoco (son espejo de members.ts).
+   ============================================================ */
+
+/* ---- Vaporwave: atardecer de Miami pirateado ---- */
+[data-palette='vaporwave'] {
+  --xp-blue-deep: #2b1055;
+  --xp-blue-bright: #4dc9ff;
+  --aero-teal: #01f9c6;
+  --aero-lime: #8affda;
+  --y2k-magenta: #ff71ce;
+  --y2k-purple: #b967ff;
+  --y2k-red: #ff4f7e;
+  --chrome-silver: #d9c8f0;
+  --warning-yellow: #fffb96;
+  --bg-cloud-white: #f3eaff;
+  --crt-black: #16082e;
+}
+
+/* ---- XP Luna: olivas y verdes del tema clásico de Windows XP ---- */
+[data-palette='xp-luna'] {
+  --xp-blue-deep: #215d21;
+  --xp-blue-bright: #73a842;
+  --aero-teal: #4f9e4f;
+  --aero-lime: #c9e57a;
+  --y2k-magenta: #d97b2f;
+  --y2k-purple: #7a6a3a;
+  --y2k-red: #c94f30;
+  --chrome-silver: #ece9d8;
+  --warning-yellow: #f5d55c;
+  --bg-cloud-white: #f7f5e8;
+  --crt-black: #1e2413;
+}
+
+/* ---- CRT: fósforo verde sobre negro, terminal de los 80 ---- */
+[data-palette='crt'] {
+  --xp-blue-deep: #043304;
+  --xp-blue-bright: #2bff2b;
+  --aero-teal: #23d923;
+  --aero-lime: #7dff7d;
+  --y2k-magenta: #b4ff5c;
+  --y2k-purple: #1a8c1a;
+  --y2k-red: #d0ff30;
+  --chrome-silver: #123c12;
+  --warning-yellow: #eaff4f;
+  --bg-cloud-white: #ccffcc;
+  --crt-black: #020a02;
+}

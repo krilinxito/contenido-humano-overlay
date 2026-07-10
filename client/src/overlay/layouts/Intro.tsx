@@ -3,7 +3,7 @@ import { SPRING_TORPE, CORTE_BRUSCO } from '../motionPresets';
 import { useOverlayStore } from '../../store/useOverlayStore';
 import { MEMBER_IDS } from '../../config/members';
 import { AvatarRow } from '../../three/avatars/AvatarRow';
-import { CHBug, SLOGAN } from '../chrome/CHBug';
+import { CHBug } from '../chrome/CHBug';
 import { XPWindow } from '../chrome/XPWindow';
 import { FakeChat } from '../chrome/FakeChat';
 import { MarqueeText } from '../chrome/MarqueeText';
@@ -13,6 +13,8 @@ import './Intro.css';
 /** Pantalla de arranque del stream: logo CH gigante, eslogan, los 5 en 3D y chat. */
 export function Intro() {
   const marquee = useOverlayStore((s) => s.texts['intro-marquee']);
+  const eslogan = useOverlayStore((s) => s.texts.eslogan);
+  const chatTitle = useOverlayStore((s) => s.texts['window-chat']);
 
   return (
     <motion.div
@@ -35,7 +37,7 @@ export function Intro() {
           initial={{ scale: 0 }}
           animate={{ scale: 1, transition: { ...SPRING_TORPE, delay: 0.4 } }}
         >
-          {SLOGAN}
+          {eslogan}
         </motion.p>
 
         <motion.div
@@ -52,7 +54,7 @@ export function Intro() {
         initial={{ x: '130%' }}
         animate={{ x: 0, transition: { ...SPRING_TORPE, delay: 0.7 } }}
       >
-        <XPWindow title="chat_en_vivo.exe" className="intro__chat-window">
+        <XPWindow title={chatTitle} className="intro__chat-window">
           <FakeChat />
         </XPWindow>
       </motion.aside>

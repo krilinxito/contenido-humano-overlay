@@ -1,7 +1,6 @@
 import { motion } from 'framer-motion';
 import { SPRING_TORPE, CORTE_BRUSCO } from '../motionPresets';
-import { useOverlayStore } from '../../store/useOverlayStore';
-import { MEMBERS } from '../../config/members';
+import { useOverlayStore, getMemberName } from '../../store/useOverlayStore';
 import { ScreenPlusCams } from './ScreenPlusCams';
 
 /**
@@ -10,10 +9,9 @@ import { ScreenPlusCams } from './ScreenPlusCams';
  */
 export function CamsPantalla() {
   const member = useOverlayStore((s) => s.activeMember);
-  const screenLabel = member ? `${MEMBERS[member].nombre} SCREEN` : 'PANTALLA DEL PRODUCTOR';
-  const windowTitle = member
-    ? `pantalla_de_${MEMBERS[member].nombre.toLowerCase()}.exe`
-    : 'productor_screen_NO_TOCAR.exe';
+  const nombre = useOverlayStore((s) => (s.activeMember ? getMemberName(s.texts, s.activeMember) : null));
+  const screenLabel = nombre ? `${nombre} SCREEN` : 'PANTALLA DEL PRODUCTOR';
+  const windowTitle = nombre ? `pantalla_de_${nombre.toLowerCase()}.exe` : 'productor_screen_NO_TOCAR.exe';
 
   return (
     <motion.div

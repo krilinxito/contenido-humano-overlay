@@ -51,7 +51,11 @@ Si el layout depende del miembro seleccionado (quién habla/expone), leer `activ
 
 ### Textos en pantalla
 
-Todo texto visible que el productor pueda querer cambiar en vivo va en `texts` del store (default en `DEFAULT_TEXTS`, `useOverlayStore.ts`) y se lee con `useOverlayStore((s) => s.texts.miClave)` — **nunca hardcodeado en el layout**. Para agregar uno: sumar la clave a `TextKey` + `DEFAULT_TEXTS`, y su fila a `TEXT_FIELDS` en `PanelApp.tsx`. Documentar en la tabla de `docs/EVENTS.md`.
+Todo texto visible que el productor pueda querer cambiar en vivo va en `texts` del store (default en `DEFAULT_TEXTS`, `useOverlayStore.ts`) y se lee con `useOverlayStore((s) => s.texts.miClave)` — **nunca hardcodeado en el layout**. Para agregar uno: sumar la clave a `TextKey` + `DEFAULT_TEXTS`, y su fila a `TEXT_FIELDS` (frecuentes) o al grupo que corresponda de `TEXT_GROUPS` en `PanelApp.tsx`. Documentar en la tabla de `docs/EVENTS.md`.
+
+Quedan afuera (a propósito): labels de `CamPlaceholder`/`ScreenPlaceholder` (en stream los tapa la cámara real) y utilería fija de chiste (las "personas" del TalkshowGrid, los `CREDITOS_EXTRA` del Outro) — eso se cambia en código.
+
+**Nombres de miembros**: nunca mostrar `MEMBERS[id].nombre` directo en el overlay — usar `getMemberName(texts, id)` (`useOverlayStore.ts`), que respeta el editable `nombre-<id>` del panel con fallback al de config. `MEMBERS[id].nombre` directo solo en el panel (chips) y como default.
 
 ## Anatomía de un gag
 

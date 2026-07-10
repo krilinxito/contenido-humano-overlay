@@ -2,6 +2,7 @@ import { useMemo, useRef } from 'react';
 import { motion } from 'framer-motion';
 import { useFrame } from '@react-three/fiber';
 import type { Group } from 'three';
+import { useOverlayStore } from '../../store/useOverlayStore';
 import { RetroCanvas } from '../../three/RetroCanvas';
 import { SPRING_TORPE } from '../motionPresets';
 import './SapoRandom.css';
@@ -56,8 +57,13 @@ function Sapo() {
 
 const FRASES = ['berp', 'croac?', 'no me juzgues', '...', 'CONTENIDO', 'hola soy el sapo'];
 
-/** Un sapo low-poly aparece en una posición random, salta, dice algo, se va (~4s). */
+/**
+ * Un sapo low-poly aparece en una posición random, salta, dice algo, se va
+ * (~4s). Con `gagText` (sapo anunciador: donaciones desde el panel) dice ESO
+ * en su burbuja en vez de la frase random, y el gag dura más (ver store).
+ */
 export function SapoRandom() {
+  const gagText = useOverlayStore((s) => s.gagText);
   // Posición y frase random, calculadas una vez por aparición.
   const { top, left, frase, flip } = useMemo(
     () => ({
@@ -88,11 +94,11 @@ export function SapoRandom() {
           </group>
         </RetroCanvas>
         <motion.div
-          className="sapo-random__bubble"
+          className={`sapo-random__bubble ${gagText ? 'sapo-random__bubble--anuncio' : ''}`}
           initial={{ scale: 0 }}
           animate={{ scale: 1, transition: { ...SPRING_TORPE, delay: 0.5 } }}
         >
-          {frase}
+          {gagText ?? frase}
         </motion.div>
       </motion.div>
     </div>

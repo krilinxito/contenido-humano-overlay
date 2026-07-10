@@ -3,6 +3,8 @@ import { SPRING_TORPE, CORTE_BRUSCO } from '../motionPresets';
 import { useOverlayStore } from '../../store/useOverlayStore';
 import { MEMBER_IDS } from '../../config/members';
 import { CamCell } from '../chrome/CamCell';
+import { CamPlaceholder } from '../chrome/CamPlaceholder';
+import { XPWindow } from '../chrome/XPWindow';
 import { DoodleStar } from '../chrome/Doodles';
 import './Debate.css';
 
@@ -12,6 +14,9 @@ import './Debate.css';
  */
 export function Debate() {
   const defensor = useOverlayStore((s) => s.activeMember);
+  const banner = useOverlayStore((s) => s.texts['debate-banner']);
+  const vs = useOverlayStore((s) => s.texts['debate-vs']);
+  const setTitle = useOverlayStore((s) => s.texts['window-set']);
   const retadores = MEMBER_IDS.filter((id) => id !== defensor);
 
   return (
@@ -34,7 +39,7 @@ export function Debate() {
             </motion.div>
           ))}
           <div className="debate__banner danger-tape">
-            <span className="debate__banner-text">QUE EMPIECE EL DEBATE</span>
+            <span className="debate__banner-text">{banner}</span>
           </div>
         </div>
       ) : (
@@ -53,7 +58,7 @@ export function Debate() {
             initial={{ scale: 0, rotate: -40 }}
             animate={{ scale: 1, rotate: -8, transition: { ...SPRING_TORPE, delay: 0.25 } }}
           >
-            <span className="debate__vs-text chroma-text">VS</span>
+            <span className="debate__vs-text chroma-text">{vs}</span>
             <DoodleStar className="debate__vs-star" size={110} />
           </motion.div>
 
@@ -68,6 +73,16 @@ export function Debate() {
               </motion.div>
             ))}
           </div>
+
+          <motion.div
+            className="debate__set"
+            initial={{ y: 260, rotate: -6 }}
+            animate={{ y: 0, rotate: -1.2, transition: { ...SPRING_TORPE, delay: 0.3 } }}
+          >
+            <XPWindow title={setTitle} className="debate__set-window">
+              <CamPlaceholder label="EL SET" index={2} cam="general" />
+            </XPWindow>
+          </motion.div>
         </div>
       )}
     </motion.div>

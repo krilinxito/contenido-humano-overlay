@@ -7,6 +7,8 @@ import { WobbleFilterDefs } from './chrome/WobbleFilterDefs';
 import { CHBug } from './chrome/CHBug';
 import { PhaseBanner } from './chrome/PhaseBanner';
 import { Jukebox } from './chrome/Jukebox';
+import { LayoutCurtain } from './chrome/LayoutCurtain';
+import { MediaLayer } from './chrome/MediaLayer';
 import { TalkshowGrid } from './layouts/TalkshowGrid';
 import { PlanoGeneral } from './layouts/PlanoGeneral';
 import { Noticiero } from './layouts/Noticiero';
@@ -70,10 +72,18 @@ const GAGS: Record<GagId, ComponentType> = {
 export function OverlayApp() {
   const layout = useOverlayStore((s) => s.layout);
   const activeGag = useOverlayStore((s) => s.activeGag);
+  const palette = useOverlayStore((s) => s.palette);
 
   useEffect(() => bindOverlaySocket(), []);
   // Solo activo con `?cams=real` (la instancia que corre dentro de OBS).
   useEffect(() => startCamRectReporting(), []);
+
+  // Paletas (evento `set-palette`): los tokens CSS se overridean bajo
+  // [data-palette] en <html> (styles/themes.css). 'default' = sin atributo.
+  useEffect(() => {
+    if (palette === 'default') delete document.documentElement.dataset.palette;
+    else document.documentElement.dataset.palette = palette;
+  }, [palette]);
 
   const Layout = LAYOUTS[layout];
   const Gag = activeGag ? GAGS[activeGag] : null;
@@ -90,7 +100,13 @@ export function OverlayApp() {
       )}
       <PhaseBanner />
       <Jukebox />
+      {/* Meme en pantalla (evento `media` del panel) — sobre el chrome,
+          debajo de los gags. */}
+      <MediaLayer />
       <AnimatePresence>{Gag && <Gag key={activeGag} />}</AnimatePresence>
+      {/* Cortinilla de cambio de layout: tapa el swap de agujeros magenta y
+          el salto de las fuentes de OBS (ver requestLayout en el store). */}
+      <LayoutCurtain />
       {/* DirtOverlay desactivado: el blend a pantalla completa costaba
           demasiado en la PC del productor (corre junto a OBS + 5 NDI).
           Ver DESIGN_SYSTEM.md, "Suciedad global". */}

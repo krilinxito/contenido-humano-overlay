@@ -1,9 +1,11 @@
+import { useOverlayStore, type ChatMessage } from '../../store/useOverlayStore';
 import './FakeChat.css';
 
-// TODO(chat): acá se conecta el chat real (Twitch/YouTube) más adelante;
-// este componente es el placeholder visual con mensajes falsos.
+// Mensajes falsos de fábrica: se muestran mientras NUNCA haya llegado un
+// mensaje real de Kick (dev sin kick-config.json se ve igual que siempre).
+// El chat real entra por `chat-message` (server/kick.js → store.chatMessages).
 
-const DEFAULT_CHAT = [
+const DEFAULT_CHAT: ChatMessage[] = [
   { user: 'xX_tomi_2003_Xx', msg: 'JAJAJAJA el sapo otra vez no' },
   { user: 'lauti.exe', msg: 'primera vez que veo esto, ¿es siempre así?' },
   { user: 'ModeradorSerio', msg: 'sí' },
@@ -14,17 +16,23 @@ const DEFAULT_CHAT = [
 ];
 
 interface FakeChatProps {
-  messages?: { user: string; msg: string }[];
+  messages?: ChatMessage[];
 }
 
-/** Lista de chat falso estilo mensajero retro + input decorativo. */
+/** Chat estilo mensajero retro: mensajes reales de Kick si llegaron, falsos si no. */
 export function FakeChat({ messages = DEFAULT_CHAT }: FakeChatProps) {
+  const chatMessages = useOverlayStore((s) => s.chatMessages);
+  const shown = chatMessages.length > 0 ? chatMessages : messages;
   return (
     <div className="fake-chat">
       <ul className="fake-chat__list">
-        {messages.map((m, i) => (
+        {shown.map((m, i) => (
           <li key={i} className="fake-chat__msg">
-            <span className="fake-chat__user">&lt;{m.user}&gt;</span> {m.msg}
+            {/* Si Kick trae color de nick se respeta; si no, el de la CSS. */}
+            <span className="fake-chat__user" style={m.color ? { color: m.color } : undefined}>
+              &lt;{m.user}&gt;
+            </span>{' '}
+            {m.msg}
           </li>
         ))}
       </ul>

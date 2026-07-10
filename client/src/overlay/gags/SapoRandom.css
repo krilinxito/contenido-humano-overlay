@@ -19,3 +19,14 @@
   box-shadow: 4px 4px 0 var(--y2k-magenta);
   white-space: nowrap;
 }
+
+/* Sapo anunciador (donaciones, `gagText`): texto dictado más largo — la
+   burbuja envuelve y grita un poco más. */
+.sapo-random__bubble--anuncio {
+  white-space: normal;
+  max-width: 380px;
+  min-width: 220px;
+  font-size: 26px;
+  text-align: center;
+  box-shadow: 4px 4px 0 var(--warning-yellow), 8px 8px 0 var(--y2k-magenta);
+}

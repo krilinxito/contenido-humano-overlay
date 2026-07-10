@@ -1,5 +1,6 @@
 import { motion } from 'framer-motion';
 import { SPRING_TORPE, CORTE_BRUSCO } from '../motionPresets';
+import { useOverlayStore } from '../../store/useOverlayStore';
 import { CamPlaceholder } from '../chrome/CamPlaceholder';
 import { DoodleSquiggle } from '../chrome/Doodles';
 import './Plano360.css';
@@ -8,6 +9,7 @@ const RING_TEXT = '360° · 360° · 360° · 360° · 360° · 360° · 360° �
 
 /** Plano dinámico: cámara en trípode 360 a pantalla completa + decoración giratoria. */
 export function Plano360() {
+  const label = useOverlayStore((s) => s.texts['plano360-label']);
   return (
     <motion.div
       className="layout-root plano-360 scanlines"
@@ -29,7 +31,7 @@ export function Plano360() {
         </svg>
       </div>
 
-      <div className="plano-360__label blink-hard">⟳ CÁMARA MAREADA ⟳</div>
+      <div className="plano-360__label blink-hard">{label}</div>
       <DoodleSquiggle className="plano-360__doodle" color="var(--y2k-magenta)" size={160} />
     </motion.div>
   );

@@ -1,7 +1,7 @@
 import { motion } from 'framer-motion';
 import { SPRING_TORPE, CORTE_BRUSCO, REBOTE_ZOCALO } from '../motionPresets';
-import { useOverlayStore } from '../../store/useOverlayStore';
-import { MEMBERS, MEMBER_IDS } from '../../config/members';
+import { useOverlayStore, getMemberName } from '../../store/useOverlayStore';
+import { MEMBER_IDS } from '../../config/members';
 import { XPWindow } from '../chrome/XPWindow';
 import { CamPlaceholder } from '../chrome/CamPlaceholder';
 import { ScreenPlaceholder } from '../chrome/ScreenPlaceholder';
@@ -16,7 +16,9 @@ import './PptHotTopic.css';
 export function PptHotTopic() {
   const presenter = useOverlayStore((s) => s.activeMember);
   const tema = useOverlayStore((s) => s.texts.tema);
-  const nombre = presenter ? MEMBERS[presenter].nombre : null;
+  const windowTitle = useOverlayStore((s) => s.texts['ppt-window']);
+  const timerLabel = useOverlayStore((s) => s.texts['ppt-timer-label']);
+  const nombre = useOverlayStore((s) => (s.activeMember ? getMemberName(s.texts, s.activeMember) : null));
 
   return (
     <motion.div
@@ -26,10 +28,7 @@ export function PptHotTopic() {
       exit={{ opacity: 0, scale: 0.92, transition: CORTE_BRUSCO }}
     >
       <div className="ppt__screen">
-        <XPWindow
-          title="presentacion_final_v3_DEFINITIVA(1).ppt — PowerPoint"
-          className="ppt__window"
-        >
+        <XPWindow title={windowTitle} className="ppt__window">
           <ScreenPlaceholder
             label={nombre ? `PPT TRUCHO DE ${nombre}` : 'PPT TRUCHO'}
             screen={presenter ? `screen-${presenter}` : 'screen-productor'}
@@ -63,7 +62,7 @@ export function PptHotTopic() {
         initial={{ y: -260, rotate: -8 }}
         animate={{ y: 0, rotate: -3, transition: { ...REBOTE_ZOCALO, delay: 0.35 } }}
       >
-        <span className="ppt__timer-label">TIEMPO RESTANTE</span>
+        <span className="ppt__timer-label">{timerLabel}</span>
         <CountdownTimer />
       </motion.div>
 

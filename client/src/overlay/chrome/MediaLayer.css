@@ -1,0 +1,50 @@
+/* Meme en pantalla (evento `media`, ver MediaLayer.tsx). El ancho lo pone
+   el componente inline (slider del panel); acá van posición y marco. */
+
+.media-layer {
+  position: absolute;
+  z-index: 80; /* encima del chrome (50), debajo de gags (100) */
+  /* Marco "recorte pegado con cinta": borde duro + sombra sólida, nada de
+     alpha (puede caer sobre un agujero magenta — ver ARCHITECTURE.md). */
+  border: 4px solid var(--crt-black);
+  outline: 3px solid var(--bg-cloud-white);
+  box-shadow: 10px 10px 0 var(--crt-black);
+  background: var(--crt-black);
+}
+
+.media-layer--center {
+  left: 50%;
+  top: 50%;
+  /* El translate convive con el scale/rotate de framer-motion vía la
+     sintaxis individual (motion usa translate/scale/rotate, no transform). */
+  translate: -50% -50%;
+}
+
+/* Los corners izquierdos esquivan el chrome persistente: tl nace debajo del
+   PhaseBanner y bl encima del CHBug (el meme igual tapa si se agranda). */
+.media-layer--tl {
+  left: 3%;
+  top: 9%;
+}
+
+.media-layer--tr {
+  right: 3%;
+  top: 5%;
+}
+
+.media-layer--bl {
+  left: 3%;
+  bottom: 12%;
+}
+
+.media-layer--br {
+  right: 3%;
+  bottom: 6%;
+}
+
+.media-layer__content {
+  display: block;
+  width: 100%;
+  max-height: 78vh;
+  object-fit: contain;
+}

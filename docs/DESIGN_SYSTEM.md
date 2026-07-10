@@ -21,6 +21,7 @@ Fuente de verdad estética. **Consultar este archivo antes de estilizar cualquie
 | `--aero-lime` | `#B4F461` | Highlights, sparkles, el sapo, estados "on air" |
 | `--y2k-magenta` | `#FF3EA5` | Gags, alertas exageradas, texto de impacto, hover chillón |
 | `--y2k-purple` | `#7B2FF7` | Gradientes con magenta/teal, fondos de gags, sombras "duras" de color |
+| `--y2k-red` | `#FF2E2E` | Acento de Mots, carteles tipo "VIRUS DETECTED", errores falsos, VS del debate |
 | `--chrome-silver` | `#D9E4EC` | Superficies de ventana/panel (cuerpo de XPWindow), botones biselados |
 | `--warning-yellow` | `#FFE135` | Alertas falsas, cinta de peligro, zócalo de noticiero, parpadeos |
 | `--bg-cloud-white` | `#F4F9FF` | Fondo base tipo cielo XP, texto sobre oscuro |
@@ -30,9 +31,25 @@ Fuente de verdad estética. **Consultar este archivo antes de estilizar cualquie
 | `--skin-brown` | `#9C6B43` | Tono de piel de avatares (Mots) |
 | `--obs-key-magenta` | `#FF00FF` | **RESERVADO — no es un color de diseño.** Es el color llave del filtro Color Key de OBS: pinta los agujeros de cámara en modo `?cams=real` (ver ARCHITECTURE.md). Cualquier píxel de este color exacto se vuelve transparente en el stream, así que jamás usarlo en un componente. No confundir con `--y2k-magenta` |
 
-Cada miembro además tiene un **color de acento asignado** (definido en `client/src/config/members.ts`, único lugar): Chavez = `--xp-blue-bright`, Aym = `--aero-teal`, Mots = `--aero-lime`, Darbolis = `--y2k-purple`, Krilin = `--y2k-magenta`. Usar ese color para su remera 3D, su chip del panel y su nametag en layouts.
+Cada miembro además tiene un **color de acento asignado** (definido en `client/src/config/members.ts`, único lugar): Aym = `--xp-blue-bright` (azul), Darbolis = `--y2k-purple` (morado), Mots = `--y2k-red` (rojo), Krilin = `--y2k-magenta` (rosado), Chavez = `--aero-lime` (verde). Ese también es el **orden oficial** del programa (el orden de claves de `MEMBERS` define `MEMBER_IDS`; grillas, strips y créditos lo heredan). Usar ese color para su remera 3D, su chip del panel y su nametag en layouts.
 
 Excepción de paleta documentada: el layout Lección usa un fondo **verde pizarrón** propio (`#2a6b4f → #143528`, en `Leccion.css`) porque ningún verde de la paleta funciona como pizarrón; no usarlo fuera de ese contexto.
+
+## Paletas (re-tematizado en vivo — `client/src/styles/themes.css`)
+
+El productor puede cambiar la paleta del overlay en vivo (evento `set-palette`, selector en el panel): `themes.css` overridea los tokens de la tabla de arriba bajo `[data-palette="<id>"]` en `<html>` (lo aplica `OverlayApp`). La default es la paleta de la tabla, sin atributo. Alternativas:
+
+| Id | Idea | Carácter |
+|---|---|---|
+| `vaporwave` | Atardecer de Miami pirateado | Rosa `#FF71CE` / cian `#01F9C6` / violeta noche `#16082E` |
+| `xp-luna` | Tema oliva clásico de Windows XP | Verdes/olivas `#73A842`, plata beige `#ECE9D8` |
+| `crt` | Terminal de fósforo verde | Todo verde sobre `#020A02`, acentos en lima/amarillo |
+
+Reglas:
+- `--obs-key-magenta` **jamás** se overridea (es el color llave del Color Key).
+- Los `--skin-*` tampoco (espejo de `members.ts`).
+- Límite conocido: los colores que viven en **JS** (acentos de miembros en `members.ts`, materiales 3D de avatares) no cambian con la paleta — solo se re-tematiza el escenario CSS.
+- Toda paleta nueva se agrega en `themes.css` + `PALETTES` (`useOverlayStore.ts`) y se documenta en esta tabla.
 
 ## Tipografías (Google Fonts, cargadas en `client/index.html`)
 
@@ -101,6 +118,7 @@ Definido en `client/src/overlay/motionPresets.ts` — **usar estos presets, no i
 - `CORTE_BRUSCO` — `{ duration: 0.12, ease: [0.9, 0, 1, 0.1] }` → casi un corte seco. Para salidas y glitches.
 - `REBOTE_ZOCALO` — `{ type: 'spring', stiffness: 300, damping: 9 }` → entra desde el costado y rebota de más. Para zócalos/banners.
 - Duraciones: entradas 0.3–0.6s con overshoot; salidas ≤0.15s (brusco). Nunca `ease: 'easeInOut'` suave.
+- **Cortinilla de layouts** (`chrome/LayoutCurtain`): 100% opaca en todo momento (nada de alpha: pasa sobre agujeros magenta) y cada variante tiene su propia animación de entrada/salida — la única regla común es cubrir todo el viewport antes de `CURTAIN_IN_MS`. Variantes: **teatro pixelado** (dos hojas plisadas que se cierran desde los costados; movimiento cuantizado en 6 saltos con un easing custom estilo 16 bits, y pliegues de stops duros en tonos `color-mix` sobre `--y2k-red` — derivación de paleta documentada, como la excepción del pizarrón), **panel Kazaa** con el logo CH (baja desde arriba, sale como CRT apagándose: se aplasta a una línea y colapsa — nunca se desliza al salir), y **señal perdida** (reusa el visual del gag `GlitchInterrupt` vía `GlitchScreen`; entra y sale con corte seco de duración 0). Los timings del ciclo viven en el store (`CURTAIN_*_MS`), no en el componente.
 
 ## Low-poly 3D (Three.js / R3F)
 

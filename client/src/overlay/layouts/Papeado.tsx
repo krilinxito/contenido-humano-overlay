@@ -4,6 +4,8 @@ import { useOverlayStore } from '../../store/useOverlayStore';
 import { MEMBER_IDS } from '../../config/members';
 import { MemberBadge } from '../chrome/MemberBadge';
 import { AvatarRow } from '../../three/avatars/AvatarRow';
+import { CamPlaceholder } from '../chrome/CamPlaceholder';
+import { XPWindow } from '../chrome/XPWindow';
 import { DoodleArrow } from '../chrome/Doodles';
 import './Papeado.css';
 
@@ -15,6 +17,11 @@ import './Papeado.css';
 export function Papeado() {
   const perdedor = useOverlayStore((s) => s.activeMember);
   const penitencia = useOverlayStore((s) => s.texts.penitencia);
+  const titulo = useOverlayStore((s) => s.texts['papeado-titulo']);
+  const redoble = useOverlayStore((s) => s.texts['papeado-redoble']);
+  const sello = useOverlayStore((s) => s.texts['papeado-sello']);
+  const penitenciaLabel = useOverlayStore((s) => s.texts['papeado-label']);
+  const setTitle = useOverlayStore((s) => s.texts['window-set']);
 
   return (
     <motion.div
@@ -29,13 +36,13 @@ export function Papeado() {
           initial={{ y: -180 }}
           animate={{ y: 0, transition: REBOTE_ZOCALO }}
         >
-          EL MÁS PAPEADO DEL DÍA
+          {titulo}
         </motion.h1>
       </div>
 
       {perdedor === null ? (
         <div className="papeado__candidatos">
-          <div className="papeado__redoble blink-hard">🥁 REDOBLE... 🥁</div>
+          <div className="papeado__redoble blink-hard">{redoble}</div>
           <motion.div
             className="papeado__row"
             initial={{ y: 220 }}
@@ -59,7 +66,7 @@ export function Papeado() {
               initial={{ scale: 4, opacity: 0, rotate: -30 }}
               animate={{ scale: 1, opacity: 1, rotate: -18, transition: { ...CORTE_BRUSCO, delay: 0.6 } }}
             >
-              PAPEADO
+              {sello}
             </motion.span>
           </motion.div>
 
@@ -69,7 +76,7 @@ export function Papeado() {
               initial={{ y: 240, rotate: 4 }}
               animate={{ y: 0, rotate: 1.5, transition: { ...REBOTE_ZOCALO, delay: 0.9 } }}
             >
-              <span className="papeado__penitencia-label">SU PENITENCIA:</span>
+              <span className="papeado__penitencia-label">{penitenciaLabel}</span>
               <span className="papeado__penitencia-text">{penitencia}</span>
             </motion.div>
           )}
@@ -77,6 +84,16 @@ export function Papeado() {
           <DoodleArrow className="papeado__doodle-arrow" color="var(--warning-yellow)" size={130} />
         </div>
       )}
+
+      <motion.div
+        className="papeado__set"
+        initial={{ y: 260, rotate: 7 }}
+        animate={{ y: 0, rotate: 2, transition: { ...SPRING_TORPE, delay: 0.35 } }}
+      >
+        <XPWindow title={setTitle} className="papeado__set-window">
+          <CamPlaceholder label="EL SET" index={2} cam="general" />
+        </XPWindow>
+      </motion.div>
     </motion.div>
   );
 }

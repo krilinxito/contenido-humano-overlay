@@ -9,6 +9,7 @@ import './Noticiero.css';
 export function Noticiero() {
   const zocalo = useOverlayStore((s) => s.texts.zocalo);
   const ticker = useOverlayStore((s) => s.texts.ticker);
+  const tag = useOverlayStore((s) => s.texts['noticiero-tag']);
   return (
     <motion.div
       className="layout-root noticiero scanlines"
@@ -28,7 +29,7 @@ export function Noticiero() {
           animate={{ x: 0, transition: { ...REBOTE_ZOCALO, delay: 0.2 } }}
           exit={{ x: '-115%', transition: CORTE_BRUSCO }}
         >
-          <span className="noticiero__titulo-tag">EN VIVO</span>
+          <span className="noticiero__titulo-tag">{tag}</span>
           <span className="noticiero__titulo-text chroma-text">{zocalo}</span>
         </motion.div>
         <motion.div

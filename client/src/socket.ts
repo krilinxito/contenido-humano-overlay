@@ -1,5 +1,14 @@
 import { io, type Socket } from 'socket.io-client';
-import { useOverlayStore, type GagId, type LayoutId, type PhaseId, type TextKey } from './store/useOverlayStore';
+import {
+  useOverlayStore,
+  DEFAULT_MEDIA,
+  type GagId,
+  type LayoutId,
+  type PhaseId,
+  type TextKey,
+  type MediaPosition,
+  type PaletteId,
+} from './store/useOverlayStore';
 import type { MemberId } from './config/members';
 import type { HoleId } from './config/cams';
 import { playSfx } from './overlay/audio';
@@ -10,7 +19,7 @@ export const DEFAULT_TIMER_MS = 5 * 60 * 1000;
 // Contrato de eventos compartido entre panel y overlay (ver docs/EVENTS.md).
 export type TriggerEvent =
   | { type: 'set-layout'; layout: LayoutId }
-  | { type: 'gag'; gag: GagId }
+  | { type: 'gag'; gag: GagId; text?: string } // text: el sapo lo dice (donaciones) y dura más
   | { type: 'set-member'; member: MemberId | null }
   | { type: 'set-phase'; phase: PhaseId | null }
   | { type: 'timer'; action: 'start' | 'stop'; durationMs?: number }
@@ -18,7 +27,21 @@ export type TriggerEvent =
   | { type: 'set-bum-index'; index: number }
   | { type: 'sfx'; id: string }
   | { type: 'music'; action: 'play' | 'stop'; track?: string }
-  | { type: 'music-volume'; volume: number };
+  | { type: 'music-volume'; volume: number }
+  | {
+      type: 'media';
+      action: 'show' | 'update' | 'hide';
+      url?: string; // requerido en show (relativa al server, ej. /media/x.mp4, o absoluta)
+      kind?: 'image' | 'video'; // requerido en show
+      scale?: number; // 0.1..1 (fracción del ancho del viewport)
+      opacity?: number; // 0..1
+      volume?: number; // 0..1, solo video
+      position?: MediaPosition;
+    }
+  | { type: 'set-palette'; palette: PaletteId }
+  // Único evento que NACE en el server (server/kick.js, chat real de Kick);
+  // el panel nunca lo emite. Llega igual que todo, por `overlay-event`.
+  | { type: 'chat-message'; user: string; msg: string; color?: string };
 
 /** Rect de una ventana de cámara o pantalla, normalizado 0..1 sobre el viewport del overlay. */
 export interface CamRect {
@@ -35,7 +58,13 @@ export interface CamRectsPayload {
   rects: CamRect[];
 }
 
-const SOCKET_URL = import.meta.env.VITE_SOCKET_URL ?? 'http://localhost:3001';
+/** URL del server (socket + uploads de memes; la usa también el panel para fetch). */
+export const SOCKET_URL = import.meta.env.VITE_SOCKET_URL ?? 'http://localhost:3001';
+
+/** Resuelve una URL de media relativa al server (los /media/* viven en :3001). */
+export function resolveMediaUrl(url: string): string {
+  return url.startsWith('http') || url.startsWith('data:') ? url : SOCKET_URL + url;
+}
 
 let socket: Socket | undefined;
 
@@ -65,7 +94,7 @@ export function bindOverlaySocket(): () => void {
   const s = getSocket();
   const onOverlayEvent = (event: TriggerEvent) => {
     const {
-      setLayout,
+      requestLayout,
       triggerGag,
       setActiveMember,
       setPhase,
@@ -75,13 +104,19 @@ export function bindOverlaySocket(): () => void {
       setBumIndex,
       setMusic,
       setMusicVolume,
+      showMedia,
+      updateMedia,
+      hideMedia,
+      setPalette,
+      pushChatMessage,
     } = useOverlayStore.getState();
     switch (event.type) {
+      // Con cortinilla: el swap del layout pasa tapado (ver LayoutCurtain).
       case 'set-layout':
-        setLayout(event.layout);
+        requestLayout(event.layout);
         break;
       case 'gag':
-        triggerGag(event.gag);
+        triggerGag(event.gag, event.text);
         break;
       case 'set-member':
         setActiveMember(event.member);
@@ -108,6 +143,34 @@ export function bindOverlaySocket(): () => void {
         break;
       case 'music-volume':
         setMusicVolume(event.volume);
+        break;
+      case 'media':
+        if (event.action === 'show' && event.url && event.kind) {
+          showMedia({
+            ...DEFAULT_MEDIA,
+            url: event.url,
+            kind: event.kind,
+            ...(event.scale !== undefined && { scale: event.scale }),
+            ...(event.opacity !== undefined && { opacity: event.opacity }),
+            ...(event.volume !== undefined && { volume: event.volume }),
+            ...(event.position !== undefined && { position: event.position }),
+          });
+        } else if (event.action === 'update') {
+          updateMedia({
+            ...(event.scale !== undefined && { scale: event.scale }),
+            ...(event.opacity !== undefined && { opacity: event.opacity }),
+            ...(event.volume !== undefined && { volume: event.volume }),
+            ...(event.position !== undefined && { position: event.position }),
+          });
+        } else if (event.action === 'hide') {
+          hideMedia();
+        }
+        break;
+      case 'set-palette':
+        setPalette(event.palette);
+        break;
+      case 'chat-message':
+        pushChatMessage({ user: event.user, msg: event.msg, color: event.color });
         break;
     }
   };

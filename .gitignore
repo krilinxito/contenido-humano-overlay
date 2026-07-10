@@ -7,6 +7,12 @@ client/dist/
 # Config local de OBS (tiene la contraseña del obs-websocket)
 server/obs-config.json
 
+# Config local del chat de Kick (canal del stream)
+server/kick-config.json
+
+# Memes subidos desde el panel (contenido local del stream)
+server/uploads/
+
 # Varios
 *.log
 .DS_Store

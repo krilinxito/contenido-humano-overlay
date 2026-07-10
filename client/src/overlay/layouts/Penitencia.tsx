@@ -1,7 +1,7 @@
 import { motion } from 'framer-motion';
 import { SPRING_TORPE, CORTE_BRUSCO, REBOTE_ZOCALO } from '../motionPresets';
-import { useOverlayStore } from '../../store/useOverlayStore';
-import { MEMBERS, MEMBER_IDS } from '../../config/members';
+import { useOverlayStore, getMemberName } from '../../store/useOverlayStore';
+import { MEMBER_IDS } from '../../config/members';
 import { XPWindow } from '../chrome/XPWindow';
 import { CamPlaceholder } from '../chrome/CamPlaceholder';
 import { CamCell } from '../chrome/CamCell';
@@ -15,6 +15,11 @@ import './Penitencia.css';
 export function Penitencia() {
   const castigado = useOverlayStore((s) => s.activeMember);
   const penitencia = useOverlayStore((s) => s.texts.penitencia);
+  const pickTitle = useOverlayStore((s) => s.texts['penitencia-pick']);
+  const cartelLabel = useOverlayStore((s) => s.texts['penitencia-label']);
+  const testigosLabel = useOverlayStore((s) => s.texts['penitencia-testigos']);
+  const setTitle = useOverlayStore((s) => s.texts['window-set']);
+  const nombre = useOverlayStore((s) => (s.activeMember ? getMemberName(s.texts, s.activeMember) : null));
   const testigos = MEMBER_IDS.filter((id) => id !== castigado);
 
   return (
@@ -31,7 +36,7 @@ export function Penitencia() {
             initial={{ scale: 0, rotate: -6 }}
             animate={{ scale: 1, rotate: -2, transition: SPRING_TORPE }}
           >
-            ¿QUIÉN PAGA?
+            {pickTitle}
           </motion.h1>
           <motion.div
             className="penitencia__pick-row"
@@ -50,12 +55,9 @@ export function Penitencia() {
             animate={{ scale: 1, rotate: -0.5, transition: SPRING_TORPE }}
           >
             <div className="penitencia__marco danger-tape">
-              <XPWindow
-                title={`${MEMBERS[castigado].nombre.toLowerCase()}_pagando.avi`}
-                className="penitencia__window"
-              >
+              <XPWindow title={`${(nombre ?? '').toLowerCase()}_pagando.avi`} className="penitencia__window">
                 <CamPlaceholder
-                  label={`CAM ${MEMBERS[castigado].nombre}`}
+                  label={`CAM ${nombre}`}
                   index={MEMBER_IDS.indexOf(castigado)}
                   cam={castigado}
                 />
@@ -66,13 +68,23 @@ export function Penitencia() {
               initial={{ y: 160, rotate: -4 }}
               animate={{ y: 0, rotate: -1.5, transition: { ...REBOTE_ZOCALO, delay: 0.4 } }}
             >
-              <span className="penitencia__cartel-label">CUMPLIENDO:</span>
+              <span className="penitencia__cartel-label">{cartelLabel}</span>
               <span className="penitencia__cartel-text">{penitencia || 'penitencia sorpresa'}</span>
             </motion.div>
           </motion.div>
 
+          <motion.div
+            className="penitencia__set"
+            initial={{ y: -260, rotate: -7 }}
+            animate={{ y: 0, rotate: -2, transition: { ...SPRING_TORPE, delay: 0.3 } }}
+          >
+            <XPWindow title={setTitle} className="penitencia__set-window">
+              <CamPlaceholder label="EL SET" index={2} cam="general" />
+            </XPWindow>
+          </motion.div>
+
           <div className="penitencia__testigos">
-            <span className="penitencia__testigos-label">la plebe reacciona</span>
+            <span className="penitencia__testigos-label">{testigosLabel}</span>
             {testigos.map((id, i) => (
               <motion.div
                 key={id}

@@ -1,7 +1,7 @@
 import { motion } from 'framer-motion';
 import { SPRING_TORPE, CORTE_BRUSCO } from '../motionPresets';
-import { useOverlayStore } from '../../store/useOverlayStore';
-import { MEMBERS, MEMBER_IDS } from '../../config/members';
+import { useOverlayStore, getMemberName } from '../../store/useOverlayStore';
+import { MEMBER_IDS } from '../../config/members';
 import { VideoPlaceholder } from '../chrome/VideoPlaceholder';
 import { CamCell } from '../chrome/CamCell';
 import { DoodleStar } from '../chrome/Doodles';
@@ -17,7 +17,8 @@ const DERECHA = MEMBER_IDS.slice(3);
 export function BumVertical() {
   const dueno = useOverlayStore((s) => s.activeMember);
   const bumIndex = useOverlayStore((s) => s.bumIndex);
-  const label = dueno ? `REEL ${bumIndex}/5 DE ${MEMBERS[dueno].nombre}` : 'REEL DE LA SEMANA';
+  const nombre = useOverlayStore((s) => (s.activeMember ? getMemberName(s.texts, s.activeMember) : null));
+  const label = nombre ? `REEL ${bumIndex}/5 DE ${nombre}` : 'REEL DE LA SEMANA';
 
   return (
     <motion.div
@@ -44,7 +45,7 @@ export function BumVertical() {
         initial={{ y: '110%', rotate: 3 }}
         animate={{ y: 0, rotate: -0.8, transition: SPRING_TORPE }}
       >
-        <VideoPlaceholder label={label} vertical />
+        <VideoPlaceholder label={label} vertical screen="screen-bum" />
         {dueno && <span className="bum-counter sticker">{bumIndex}/5</span>}
       </motion.div>
 

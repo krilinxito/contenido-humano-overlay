@@ -12,7 +12,7 @@ cd ../server && node index.js  # sirve overlay + panel + socket en :3001
 - Overlay para OBS: `http://localhost:3001/` (acepta `?layout=<id>`)
 - Panel del productor: `http://localhost:3001/panel`
 
-El dev server de Vite (`npm run dev`, puerto 5173) es **solo para desarrollo**: sirve React sin minificar, corre HMR, y su `StrictMode` monta todo dos veces — incluidos los contextos WebGL. En el stream siempre la versión buildeada desde el server.
+El dev server de Vite (`npm run dev`, puerto 5173) es **solo para desarrollo**: sirve React sin minificar y corre HMR. Para juzgar **rendimiento** (fluidez, GPU) siempre usar el build servido por Express en `http://localhost:3001/` — es lo que corre en el stream; el dev server siempre va a ir más pesado. (Nota: el proyecto no usa `StrictMode` a propósito — en dev duplicaba todos los contextos WebGL, ver `client/src/main.tsx`.)
 
 ## Checklist de OBS
 
@@ -40,6 +40,13 @@ Prueba rápida sin salir al aire: con OBS y el server corriendo, cambiar layouts
 - Por el Browser Source del overlay sale TODO el audio del show que dispara el panel (SFX + música). Por default suena por los parlantes de la PC y entra al stream vía "Audio del escritorio"; **recomendado**: activar "Controlar el audio desde OBS" en las propiedades de la fuente para que aparezca como canal propio **"Overlay"** en el mezclador (nivel independiente, y no depende del audio del escritorio ni suena por los parlantes salvo que actives monitoreo). El volumen fino de la música se maneja con el slider del panel.
 - **No abrir el overlay (`/` con o sin `?cams=real`) en ningún otro navegador durante el show**: cada instancia extra reproduce el audio también (doble bocina). El panel no suena.
 - El autoplay funciona solo dentro de OBS; si probás el overlay en un navegador normal, hacé un click en la página antes o el navegador bloquea el audio.
+
+## Chat real de Kick
+
+- Copiar `server/kick-config.example.json` → `server/kick-config.json` (gitignoreado) y poner `"enabled": true` + `"channel": "<slug del canal>"` (el slug es lo que va en la URL `kick.com/<slug>`).
+- El server se conecta **solo lectura, sin cuenta ni token** al websocket público de Kick y re-emite cada mensaje como `chat-message` (ver EVENTS.md); lo muestran los chats de Intro y Plano General. Sin config o con Kick caído, el overlay cae a los mensajes falsos de siempre — nunca rompe el show.
+- Si en el log aparece `no pude resolver el canal` (Cloudflare a veces bloquea la API server-side): abrir `kick.com/api/v2/channels/<slug>` en un navegador, copiar el `chatroom.id` del JSON y ponerlo como `"chatroomId"` en el json. El server lo usa de fallback.
+- Verificación pre-show: mandar un mensaje en el chat de Kick y verlo aparecer en el overlay (layout Intro o Plano General).
 
 ## Checklist de NDI (las 5 laptops)
 

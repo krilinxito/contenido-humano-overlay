@@ -2,9 +2,9 @@ import { useMemo } from 'react';
 import { motion } from 'framer-motion';
 import { SPRING_TORPE, CORTE_BRUSCO } from '../motionPresets';
 import { MEMBER_IDS, MEMBERS, randomAdjetivo } from '../../config/members';
+import { useOverlayStore, getMemberName } from '../../store/useOverlayStore';
 import { LowPolyScene } from '../../three/LowPolyScene';
 import { AvatarColumn } from '../../three/avatars/AvatarRow';
-import { SLOGAN } from '../chrome/CHBug';
 import { MarqueeText } from '../chrome/MarqueeText';
 import './Outro.css';
 
@@ -25,6 +25,7 @@ const CREDITOS_EXTRA = [
 
 /** Cierre del stream: créditos rodando sobre la escena low-poly. */
 export function Outro() {
+  const texts = useOverlayStore((s) => s.texts);
   // Un adjetivo por miembro por pasada de créditos.
   const adjetivos = useMemo(
     () => Object.fromEntries(MEMBER_IDS.map((id) => [id, randomAdjetivo(id)])),
@@ -42,8 +43,8 @@ export function Outro() {
 
       <div className="outro__roll-wrap">
         <div className="outro__roll">
-          <h1 className="outro__titulo chroma-text">ESO FUE TODO</h1>
-          <p className="outro__subtitulo">(sí, en serio)</p>
+          <h1 className="outro__titulo chroma-text">{texts['outro-titulo']}</h1>
+          <p className="outro__subtitulo">{texts['outro-sub']}</p>
 
           {/* UN solo Canvas para los 5 bustos (regla AvatarRow/AvatarColumn):
               antes eran 5 AvatarBust = 5 contextos WebGL y el navegador
@@ -60,7 +61,7 @@ export function Outro() {
               <div key={id} className="outro__credito">
                 <div className="outro__credito-avatar" />
                 <span className="outro__credito-nombre" style={{ color: MEMBERS[id].color }}>
-                  {MEMBERS[id].nombre}
+                  {getMemberName(texts, id)}
                 </span>
                 <span className="outro__credito-rol">“{adjetivos[id]}”</span>
               </div>
@@ -74,22 +75,19 @@ export function Outro() {
             </div>
           ))}
 
-          <p className="outro__slogan">{SLOGAN}</p>
+          <p className="outro__slogan">{texts.eslogan}</p>
           <motion.h2
             className="outro__gracias"
             initial={{ scale: 0 }}
             animate={{ scale: 1, rotate: -3, transition: { ...SPRING_TORPE, delay: 0.5 } }}
           >
-            GRACIAS POR NADA ♥
+            {texts['outro-gracias']}
           </motion.h2>
         </div>
       </div>
 
       <div className="outro__marquee-wrap">
-        <MarqueeText
-          text="CHAU ★ NOS VEMOS LA PRÓXIMA ★ O NO ★ APAGÁ EL STREAM ★ DALE ★ CHAU ★ "
-          className="outro__marquee"
-        />
+        <MarqueeText text={texts['outro-marquee']} className="outro__marquee" />
       </div>
     </motion.div>
   );

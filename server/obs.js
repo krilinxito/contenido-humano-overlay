@@ -43,14 +43,16 @@ const obs = new OBSWebSocket();
 /** Ids que se ajustan con "fit" (SCALE_INNER, sin recortar) en vez de "cover" —
  *  pensado para pantallas compartidas, donde recortar se come contenido. */
 const fitIds = new Set(config?.fit ?? []);
-/** Ids de pantalla configurados: comparten agujero, así que hay que estacionar
- *  las ausentes (ver applyCamRects). */
-const screenIds = config ? Object.keys(config.sources).filter((id) => id.startsWith('screen-')) : [];
 
 let connected = false;
 let base = { width: 1920, height: 1080 };
 /** camId -> sceneItemId dentro de config.scene (se resuelve al conectar). */
 const itemIds = new Map();
+/** sourceName -> descriptor de la última transform aplicada, para no mandar
+ *  no-ops a OBS en cada payload. Por FUENTE y no por id: varios ids comparten
+ *  fuente física, y si se cacheara por id un movimiento vía un id dejaría
+ *  stale el cache de los otros. */
+const lastApplied = new Map();
 /** Último payload recibido, para re-aplicar al (re)conectar. */
 let lastPayload = null;
 let retryTimer = null;
@@ -82,6 +84,7 @@ async function connect() {
   }
 
   itemIds.clear();
+  lastApplied.clear();
   warnedMissing.clear();
   for (const camId of Object.keys(config.sources)) {
     await resolveItemId(camId);
@@ -130,13 +133,14 @@ obs.on('ConnectionClosed', () => {
 
 /**
  * Aplica los rects reportados por el overlay: posiciona cada fuente de cámara
- * detrás de su agujero. Las cámaras nunca se ocultan (el overlay opaco las
- * tapa cuando el layout no las muestra) — así no parpadean entre layouts.
- *
- * Las pantallas (`screen-*`) son la excepción: todas comparten EL MISMO
- * agujero, así que la que quedó de antes taparía a la nueva según el z-order.
- * Las ausentes del payload se estacionan fuera del canvas (sin
- * SetSceneItemEnabled, es el mismo mecanismo de transform).
+ * detrás de su agujero, y estaciona fuera del canvas TODA fuente ausente del
+ * payload. Nunca se usa SetSceneItemEnabled — todo es el mismo mecanismo de
+ * transform. Estacionar es necesario porque una fuente que quedó de un layout
+ * anterior puede caer bajo el agujero de OTRA cam y taparla si está por
+ * encima en el z-order de la escena (ej.: en PPT el agujero de coca1 mostraba
+ * ayjm1). Ojo: varios ids pueden mapear a la misma fuente física de OBS
+ * (general/noticiero/…), así que solo se estaciona una fuente si NINGÚN id
+ * presente la está usando.
  */
 export function applyCamRects(payload) {
   if (!config) return;
@@ -144,17 +148,24 @@ export function applyCamRects(payload) {
   if (!connected) return;
 
   const present = new Set(payload.rects.map((r) => r.cam));
+  const usedSources = new Set(payload.rects.map((r) => config.sources[r.cam]).filter(Boolean));
   for (const rect of payload.rects) {
     moveCam(rect);
   }
-  for (const screenId of screenIds) {
-    if (!present.has(screenId)) parkScreen(screenId);
+  const parked = new Set();
+  for (const camId of Object.keys(config.sources)) {
+    const sourceName = config.sources[camId];
+    if (present.has(camId) || usedSources.has(sourceName) || parked.has(sourceName)) continue;
+    parked.add(sourceName);
+    parkSource(camId);
   }
 }
 
-/** Manda una pantalla no usada fuera del canvas (a la derecha, sin escalar). */
-async function parkScreen(screenId) {
-  const sceneItemId = itemIds.get(screenId) ?? (await resolveItemId(screenId));
+/** Manda una fuente no usada fuera del canvas (a la derecha, sin escalar). */
+async function parkSource(camId) {
+  const sourceName = config.sources[camId];
+  if (lastApplied.get(sourceName) === 'parked') return;
+  const sceneItemId = itemIds.get(camId) ?? (await resolveItemId(camId));
   if (sceneItemId === undefined) return;
   try {
     await obs.call('SetSceneItemTransform', {
@@ -162,13 +173,18 @@ async function parkScreen(screenId) {
       sceneItemId,
       sceneItemTransform: { positionX: base.width * 2, positionY: 0, alignment: 5 },
     });
+    lastApplied.set(sourceName, 'parked');
   } catch (err) {
-    itemIds.delete(screenId);
-    console.warn(`[obs] no pude estacionar la pantalla "${screenId}": ${err.message}`);
+    itemIds.delete(camId);
+    lastApplied.delete(sourceName);
+    console.warn(`[obs] no pude estacionar la fuente "${camId}": ${err.message}`);
   }
 }
 
 async function moveCam(rect) {
+  const sourceName = config.sources[rect.cam];
+  const applied = `${rect.x},${rect.y},${rect.w},${rect.h},${fitIds.has(rect.cam)}`;
+  if (lastApplied.get(sourceName) === applied) return;
   const sceneItemId = itemIds.get(rect.cam) ?? (await resolveItemId(rect.cam));
   if (sceneItemId === undefined) return;
   try {
@@ -192,10 +208,12 @@ async function moveCam(rect) {
         cropToBounds: true,
       },
     });
+    lastApplied.set(sourceName, applied);
   } catch (err) {
     // Id viejo (fuente borrada/recreada): se descarta y el próximo
     // cam-rects lo re-resuelve.
     itemIds.delete(rect.cam);
+    lastApplied.delete(sourceName);
     console.warn(`[obs] no pude mover la cam "${rect.cam}": ${err.message}`);
   }
 }

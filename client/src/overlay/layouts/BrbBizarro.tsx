@@ -6,6 +6,7 @@ import './BrbBizarro.css';
 
 /** Pantalla de "ya volvemos" con la escena 3D low-poly de protagonista. */
 export function BrbBizarro() {
+  const title = useOverlayStore((s) => s.texts['brb-title']);
   const sub = useOverlayStore((s) => s.texts['brb-sub']);
   return (
     <motion.div
@@ -22,7 +23,7 @@ export function BrbBizarro() {
           initial={{ y: -200, rotate: -8 }}
           animate={{ y: 0, rotate: -3, transition: { ...SPRING_TORPE, delay: 0.2 } }}
         >
-          YA VOLVEMOS
+          {title}
         </motion.h1>
         <motion.p
           className="brb-bizarro__subtitle"

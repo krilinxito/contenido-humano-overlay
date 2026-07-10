@@ -64,22 +64,23 @@ Objetivo: que las cámaras se vean **dentro** de los marcos del overlay, con el 
 **Decisiones y límites (importantes):**
 
 - **Por qué color key y no transparencia real**: un agujero con alpha CSS no perfora los fondos de los ancestros (el degradado full-screen del layout pinta detrás de la ventana); perforarlos exigiría enmascarar dinámicamente el fondo de cada layout. El color key lo resuelve sin tocar ningún fondo existente.
-- Las cámaras **nunca se ocultan** con `SetSceneItemEnabled`: cuando un layout no las muestra, el overlay opaco las tapa. Así no parpadean al cambiar de layout.
+- Nunca se usa `SetSceneItemEnabled`: las fuentes **ausentes del payload se estacionan fuera del canvas** (transform con `positionX` fuera de pantalla). No alcanza con que el overlay opaco las tape: la fuente que quedó de un layout anterior puede caer bajo el agujero de **otra** cam y taparla si está por encima en el z-order de la escena (ej.: en PPT el agujero de coca1 mostraba ayjm1). Como varios ids pueden mapear a la misma fuente física, solo se estaciona una fuente que ningún id presente esté usando.
 - Los transforms van con `cropToBounds: true` (OBS 30.2+): sin eso, el desborde del modo cover se ve a través de los agujeros **vecinos** (el overlay tapa el desborde, pero los otros marcos también son transparentes).
 - Los transforms de OBS son **saltos secos**, no animaciones: durante la entrada animada de un layout la cámara puede quedar ~300ms desalineada hasta que el reporter re-mide. El marco grueso lo disimula.
 - Nada **semitransparente** debe pintarse sobre un agujero magenta (se keyea a medias y queda glitchoso). Elementos opacos (stickers, doodles, badges) pasan por encima sin problema.
 - `?cams=real` va en **una sola** Browser Source. Con el modo híbrido de escenas (varias sources con `?layout=`), las instancias reportarían rects contradictorios. Para cámaras reales la operación recomendada es **escena única** + cambios de layout desde el panel (`set-layout`).
 - La integración obs-websocket vive **solo en `server/obs.js`** — el overlay únicamente reporta rects; el client jamás importa obs-websocket-js.
-- Cams especiales (`general`, `noticiero`, `plano360`) se mapean a fuentes reales en `server/obs-config.json`; varias pueden apuntar a la misma fuente física.
+- Cams especiales (`general`, `noticiero`, `plano360`) se mapean a fuentes reales en `server/obs-config.json`; varias pueden apuntar a la misma fuente física. La cam del set (`general`, fuente "Cam1") no es solo del plano general: Tertulia, Debate, Papeado y Penitencia la muestran como ventana secundaria flotante para que el set esté presente aunque la escena sea de webcams.
 
 **Pantallas compartidas (`screen-*`):**
 
 El mismo mecanismo cubre las pantallas: `obs.js` es **agnóstico al tipo de fuente** (solo hace `GetSceneItemId` por nombre + `SetSceneItemTransform`), así que da igual que la fuente sea una webcam USB, una **NDI** (pantalla de un miembro remoto) o una **captura de ventana** (pantalla del productor en la PC del stream). No se declara el tipo en ningún lado: solo el nombre de la source en `obs-config.json`.
 
-- Ids: `screen-chavez` … `screen-krilin` (NDI de cada miembro) + `screen-productor` (`ScreenId` en `client/src/config/cams.ts`; `HoleId = CamId | ScreenId` es lo que viaja en `cam-rects`).
+- Ids: `screen-chavez` … `screen-krilin` (NDI de cada miembro) + `screen-productor` + `screen-bum` (`ScreenId` en `client/src/config/cams.ts`; `HoleId = CamId | ScreenId` es lo que viaja en `cam-rects`).
 - `ScreenPlaceholder` acepta prop `screen?: ScreenId` y en `?cams=real` se vuelve agujero magenta, igual que `CamPlaceholder`. Los layouts con pantalla (Lección, CamsPantalla, PPT) derivan el id de `activeMember` (fallback `screen-productor`); Tema usa `screen-productor` fijo. Cambiar quién comparte = `set-member` desde el panel, sin tocar OBS.
-- **Fit, no cover**: los ids listados en `"fit"` de `obs-config.json` usan `OBS_BOUNDS_SCALE_INNER` (se ve todo el contenido; recortar una PPT se come texto). Si el aspecto no coincide queda franja — conviene una source de color sólido justo debajo de las pantallas en OBS. Las cams siguen con cover.
-- **Excepción a "nunca se ocultan"**: las 6 sources de pantalla comparten **el mismo agujero**, así que la anterior taparía a la nueva según el z-order. Las `screen-*` ausentes del payload se **estacionan fuera del canvas** (transform con `positionX` fuera de pantalla — sin `SetSceneItemEnabled`). El costo es el mismo salto seco de ~300ms ya aceptado en transiciones.
+- **`screen-bum`**: el agujero de video de los BUM (h/v). `VideoPlaceholder` acepta `screen?` igual que los otros placeholders; en modo agujero deja sus controles falsos (opacos) encima del video real, como un reproductor de verdad. Qué fuente reproduce los BUM se decide **solo en `obs-config.json`** (`"screen-bum": "<source>"` — típicamente la NDI de un miembro).
+- **Cover por default (decisión post-pruebas)**: la lista `"fit"` de `obs-config.json` quedó **vacía** — las pantallas también llenan su recuadro (`SCALE_OUTER` + `cropToBounds`), porque los recuadros no-16:9 dejaban franjas feas. El mecanismo sigue: cualquier id listado en `"fit"` vuelve a `OBS_BOUNDS_SCALE_INNER` (útil si alguna vez una PPT pierde texto por el recorte).
+- Las 6 sources de pantalla comparten **el mismo agujero**, así que dependen especialmente del estacionamiento de fuentes ausentes (ver arriba — hoy aplica a todas las fuentes, no solo a las `screen-*`). El costo es el mismo salto seco de ~300ms ya aceptado en transiciones.
 
 ## Audio (soundboard + jukebox)
 
@@ -103,6 +104,12 @@ PanelApp (botón)
 
 Los gags se auto-limpian: `triggerGag` setea `activeGag` y un `setTimeout` con la duración del gag (definida en `GAG_DURATIONS_MS` en el store) lo vuelve a `null`. El layout anterior nunca se pierde porque los gags son capas superpuestas, no reemplazos de layout.
 
+**Cortinilla de transición**: `set-layout` por socket no conmuta el layout directo — llama `requestLayout()` (store), que cierra la cortinilla opaca (`LayoutCurtain`, chrome), conmuta el layout tapado a los `CURTAIN_IN_MS` y la abre a los `CURTAIN_IN_MS + CURTAIN_HOLD_MS` (~780ms total). Motivo: el swap de agujeros magenta animados destellaba (opacity sobre magenta se keyea a medias) y las fuentes de OBS saltan ~300ms tarde; con la cortina, todo eso pasa fuera de cámara. Tres variantes elegidas al azar, cada una con su propia animación de entrada/salida (la restricción común: cubrir todo antes de `CURTAIN_IN_MS`): cortina de teatro pixelada, panel Kazaa con apagado CRT, y señal perdida — esta última reusa `GlitchScreen`, el visual compartido con el gag `GlitchInterrupt`. `setLayout` directo sigue existiendo (carga inicial por `?layout=`, sin cortina). Pedidos consecutivos rápidos resetean los timers y gana el último layout.
+
+**Chat real de Kick** (`chat-message`): único evento que **nace en el server** y no en el panel — `server/kick.js` (espejo del patrón de `obs.js`: config propia gitignoreada, degradación elegante, retry) escucha el websocket público de Kick y broadcastea cada mensaje con la misma forma `overlay-event`. El overlay lo bufferea en `chatMessages` (store) y `FakeChat` lo muestra, con fallback a los mensajes falsos si nunca llegó nada. Config/checklist en PRODUCCION.md.
+
+**Memes** (`media`): el server además expone dos endpoints HTTP (los únicos, aparte de servir el build): `POST /api/media` (upload multipart desde el panel; los archivos quedan en `server/uploads/`, gitignoreado) y `GET /api/media` (galería). Mostrar/ajustar/ocultar sigue el flujo normal por Socket.io (`chrome/MediaLayer.tsx`); el detalle está en `docs/EVENTS.md`.
+
 Ver `docs/EVENTS.md` para el contrato exacto de cada evento.
 
 ## Estado (Zustand — `useOverlayStore.ts`)
@@ -121,7 +128,8 @@ Ver `docs/EVENTS.md` para el contrato exacto de cada evento.
 
 - `CHBug` — logo CH + eslogan, **abajo a la izquierda** (para no tapar cámaras) en todos los layouts salvo `LAYOUTS_SIN_BUG` (hoy: `intro`, que ya tiene el logo XL). En layouts con zócalo inferior (`LAYOUTS_BUG_ARRIBA`, hoy: `noticiero`) va arriba a la derecha.
 - `PhaseBanner` — fase actual del programa, esquina superior izquierda, visible solo si `phase !== null`.
-- Capas (z-index): layout (0) → chrome persistente (50) → gags (100) → scanlines del layout (200).
+- `MediaLayer` — meme (imagen/video) disparado desde el panel (evento `media`); persiste entre cambios de layout.
+- Capas (z-index): layout (0) → chrome persistente (50) → memes (80) → gags (100) → scanlines del layout (200) → cortinilla (300).
 
 ## Layouts (17, todos implementados)
 

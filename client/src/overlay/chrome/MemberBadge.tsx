@@ -1,5 +1,6 @@
 import { useMemo } from 'react';
 import { MEMBERS, randomAdjetivo, type MemberId } from '../../config/members';
+import { useOverlayStore, getMemberName } from '../../store/useOverlayStore';
 import { AvatarBust } from '../../three/avatars/AvatarBust';
 import './MemberBadge.css';
 
@@ -13,6 +14,7 @@ interface MemberBadgeProps {
 /** Sticker estilo Paint con el avatar 3D, nombre y un adjetivo random del pool. */
 export function MemberBadge({ member, size = 'lg', className = '' }: MemberBadgeProps) {
   const data = MEMBERS[member];
+  const nombre = useOverlayStore((s) => getMemberName(s.texts, member));
   // Un adjetivo por aparición del badge (cambia al cambiar de miembro).
   const adjetivo = useMemo(() => randomAdjetivo(member), [member]);
 
@@ -30,7 +32,7 @@ export function MemberBadge({ member, size = 'lg', className = '' }: MemberBadge
         <div className="member-badge__avatar">
           <AvatarBust member={member} />
         </div>
-        <div className="member-badge__nombre">{data.nombre}</div>
+        <div className="member-badge__nombre">{nombre}</div>
         {size === 'lg' && <div className="member-badge__adjetivo">“{adjetivo}”</div>}
       </div>
     </div>

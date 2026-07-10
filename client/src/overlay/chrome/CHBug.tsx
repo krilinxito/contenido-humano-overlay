@@ -1,6 +1,5 @@
+import { useOverlayStore } from '../../store/useOverlayStore';
 import './CHBug.css';
-
-export const SLOGAN = 'En la era de la inteligencia artificial abraza la estupidez humana';
 
 interface CHBugProps {
   /** Muestra el eslogan en marquee debajo del logo. */
@@ -14,6 +13,7 @@ interface CHBugProps {
  * `ch-bug-wrap--top-right`. También reusable en tamaño XL (Intro).
  */
 export function CHBug({ showSlogan = true, className = '' }: CHBugProps) {
+  const eslogan = useOverlayStore((s) => s.texts.eslogan);
   return (
     <div className={`ch-bug-wrap ${className}`}>
       {/* El sway va en un wrapper aparte: animar transform en el mismo
@@ -27,7 +27,7 @@ export function CHBug({ showSlogan = true, className = '' }: CHBugProps) {
       </div>
       {showSlogan && (
         <div className="ch-bug__slogan marquee">
-          <span className="marquee-inner">{SLOGAN} ★ </span>
+          <span className="marquee-inner">{eslogan} ★ </span>
         </div>
       )}
     </div>

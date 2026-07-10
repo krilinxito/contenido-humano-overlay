@@ -17,14 +17,8 @@
     "screen-mots": "NDI Screen Mots",
     "screen-darbolis": "NDI Screen Darbolis",
     "screen-krilin": "NDI Screen Krilin",
-    "screen-productor": "Captura Ventana Productor"
+    "screen-productor": "Captura Ventana Productor",
+    "screen-bum": "NDI Screen Krilin"
   },
-  "fit": [
-    "screen-chavez",
-    "screen-aym",
-    "screen-mots",
-    "screen-darbolis",
-    "screen-krilin",
-    "screen-productor"
-  ]
+  "fit": []
 }

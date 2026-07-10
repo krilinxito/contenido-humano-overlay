@@ -1,7 +1,7 @@
 import { motion } from 'framer-motion';
 import { SPRING_TORPE, CORTE_BRUSCO } from '../motionPresets';
-import { useOverlayStore } from '../../store/useOverlayStore';
-import { MEMBERS, MEMBER_IDS } from '../../config/members';
+import { useOverlayStore, getMemberName } from '../../store/useOverlayStore';
+import { MEMBER_IDS } from '../../config/members';
 import { XPWindow } from '../chrome/XPWindow';
 import { CamPlaceholder } from '../chrome/CamPlaceholder';
 import { MemberBadge } from '../chrome/MemberBadge';
@@ -16,6 +16,9 @@ import './Tertulia.css';
  */
 export function Tertulia() {
   const activeMember = useOverlayStore((s) => s.activeMember);
+  const pickTitle = useOverlayStore((s) => s.texts['tertulia-pick']);
+  const setTitle = useOverlayStore((s) => s.texts['window-set']);
+  const nombre = useOverlayStore((s) => (s.activeMember ? getMemberName(s.texts, s.activeMember) : null));
 
   return (
     <motion.div
@@ -31,7 +34,7 @@ export function Tertulia() {
             initial={{ scale: 0, rotate: 8 }}
             animate={{ scale: 1, rotate: -2, transition: SPRING_TORPE }}
           >
-            ¿QUIÉN EMPIEZA?
+            {pickTitle}
           </motion.h1>
           <motion.div
             className="tertulia__pick-row"
@@ -49,27 +52,38 @@ export function Tertulia() {
             initial={{ scale: 0.85, rotate: -2 }}
             animate={{ scale: 1, rotate: -0.5, transition: SPRING_TORPE }}
           >
-            <XPWindow
-              title={`${MEMBERS[activeMember].nombre.toLowerCase()}_en_vivo.avi`}
-              className="tertulia__window"
-            >
+            <XPWindow title={`${(nombre ?? '').toLowerCase()}_en_vivo.avi`} className="tertulia__window">
               <CamPlaceholder
-                label={`CAM ${MEMBERS[activeMember].nombre}`}
+                label={`CAM ${nombre}`}
                 index={MEMBER_IDS.indexOf(activeMember)}
                 cam={activeMember}
               />
             </XPWindow>
           </motion.div>
 
-          <motion.div
-            className="tertulia__badge"
-            key={`badge-${activeMember}`}
-            initial={{ x: 400, rotate: 15 }}
-            animate={{ x: 0, rotate: 0, transition: { ...SPRING_TORPE, delay: 0.15 } }}
-          >
-            <MemberBadge member={activeMember} size="lg" />
-            <DoodleArrow className="tertulia__arrow" size={110} />
-          </motion.div>
+          {/* Columna derecha: badge arriba + ventana del set abajo, en flujo
+              (compartían la esquina como absolutes y la ventana pisaba al avatar). */}
+          <div className="tertulia__side">
+            <motion.div
+              className="tertulia__badge"
+              key={`badge-${activeMember}`}
+              initial={{ x: 400, rotate: 15 }}
+              animate={{ x: 0, rotate: 0, transition: { ...SPRING_TORPE, delay: 0.15 } }}
+            >
+              <MemberBadge member={activeMember} size="lg" />
+              <DoodleArrow className="tertulia__arrow" size={110} />
+            </motion.div>
+
+            <motion.div
+              className="tertulia__set"
+              initial={{ y: 260, rotate: 6 }}
+              animate={{ y: 0, rotate: 1.6, transition: { ...SPRING_TORPE, delay: 0.25 } }}
+            >
+              <XPWindow title={setTitle} className="tertulia__set-window">
+                <CamPlaceholder label="EL SET" index={2} cam="general" />
+              </XPWindow>
+            </motion.div>
+          </div>
 
           <DoodleCircle className="tertulia__doodle-circle" size={120} />
         </div>

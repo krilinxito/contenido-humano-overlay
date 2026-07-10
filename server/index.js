@@ -5,14 +5,18 @@
 // a transforms de OBS vía obs-websocket (server/obs.js) — sin re-emitirlo.
 import express from 'express';
 import { createServer } from 'node:http';
-import { existsSync } from 'node:fs';
+import { existsSync, mkdirSync, readdirSync, unlinkSync } from 'node:fs';
 import path from 'node:path';
 import { fileURLToPath } from 'node:url';
 import { Server } from 'socket.io';
+import multer from 'multer';
 import { applyCamRects, isValidCamRectsPayload, startObsIntegration } from './obs.js';
+import { startKickIntegration } from './kick.js';
 
 const PORT = process.env.PORT ?? 3001;
-const DIST = path.join(path.dirname(fileURLToPath(import.meta.url)), '../client/dist');
+const ROOT = path.dirname(fileURLToPath(import.meta.url));
+const DIST = path.join(ROOT, '../client/dist');
+const UPLOADS = path.join(ROOT, 'uploads');
 
 const app = express();
 const httpServer = createServer(app);
@@ -20,9 +24,89 @@ const io = new Server(httpServer, {
   cors: { origin: '*' },
 });
 
+// ---- Memes (imágenes/videos subidos desde el panel, ver docs/EVENTS.md) ----
+// Los archivos quedan en server/uploads/ (gitignoreado) y se sirven en
+// /media/<archivo>. El panel los sube por POST /api/media y dispara el
+// evento `media` por socket para mostrarlos en el overlay.
+mkdirSync(UPLOADS, { recursive: true });
+
+const upload = multer({
+  storage: multer.diskStorage({
+    destination: UPLOADS,
+    filename: (_req, file, cb) => {
+      // Nombre original saneado + timestamp para no pisar subidas repetidas.
+      const base = path
+        .parse(file.originalname)
+        .name.replace(/[^a-zA-Z0-9-_]+/g, '_')
+        .slice(0, 60);
+      cb(null, `${Date.now()}-${base}${path.extname(file.originalname).toLowerCase()}`);
+    },
+  }),
+  limits: { fileSize: 100 * 1024 * 1024 },
+  fileFilter: (_req, file, cb) => {
+    cb(null, file.mimetype.startsWith('image/') || file.mimetype.startsWith('video/'));
+  },
+});
+
+const IMAGE_EXT = new Set(['.png', '.jpg', '.jpeg', '.gif', '.webp', '.avif', '.svg']);
+const VIDEO_EXT = new Set(['.mp4', '.webm', '.mov', '.mkv']);
+
+app.use('/media', express.static(UPLOADS));
+
+// CORS simple para el panel en dev (Vite 5173 → server 3001). El DELETE
+// dispara preflight, así que también se responde el OPTIONS.
+app.use('/api', (req, res, next) => {
+  res.setHeader('Access-Control-Allow-Origin', '*');
+  res.setHeader('Access-Control-Allow-Methods', 'GET, POST, DELETE');
+  if (req.method === 'OPTIONS') {
+    res.sendStatus(204);
+    return;
+  }
+  next();
+});
+
+app.post('/api/media', upload.single('file'), (req, res) => {
+  if (!req.file) {
+    res.status(400).json({ error: 'archivo faltante o tipo no permitido (solo imagen/video)' });
+    return;
+  }
+  console.log(`[media] subido: ${req.file.filename} (${Math.round(req.file.size / 1024)} KB)`);
+  res.json({ url: `/media/${req.file.filename}` });
+});
+
+app.get('/api/media', (_req, res) => {
+  const files = readdirSync(UPLOADS)
+    .filter((f) => IMAGE_EXT.has(path.extname(f).toLowerCase()) || VIDEO_EXT.has(path.extname(f).toLowerCase()))
+    .sort()
+    .reverse() // más nuevos primero (prefijo timestamp)
+    .map((f) => ({
+      name: f.replace(/^\d+-/, ''),
+      url: `/media/${f}`,
+      kind: VIDEO_EXT.has(path.extname(f).toLowerCase()) ? 'video' : 'image',
+    }));
+  res.json(files);
+});
+
+app.delete('/api/media/:file', (req, res) => {
+  // basename anti path-traversal: el param jamás puede salir de uploads/.
+  const file = path.basename(req.params.file);
+  const target = path.join(UPLOADS, file);
+  if (!existsSync(target)) {
+    res.status(404).json({ error: 'no existe' });
+    return;
+  }
+  try {
+    unlinkSync(target);
+    console.log(`[media] borrado: ${file}`);
+    res.json({ ok: true });
+  } catch (err) {
+    res.status(500).json({ error: err.message });
+  }
+});
+
 // En producción (stream) el overlay se sirve BUILDEADO desde acá — el dev
-// server de Vite es solo para desarrollo (React sin minificar + StrictMode
-// monta los contextos WebGL dos veces). Ver docs/PRODUCCION.md.
+// server de Vite es solo para desarrollo (React sin minificar).
+// Ver docs/PRODUCCION.md.
 if (existsSync(DIST)) {
   app.use(express.static(DIST));
   // SPA con dos vistas por pathname (no hay router real): ambas sirven el
@@ -69,3 +153,6 @@ httpServer.listen(PORT, () => {
 });
 
 startObsIntegration();
+// Chat real de Kick (kick.js): único evento que nace en el server — se
+// broadcastea con la misma forma `overlay-event` que todo lo demás.
+startKickIntegration((event) => io.emit('overlay-event', event));

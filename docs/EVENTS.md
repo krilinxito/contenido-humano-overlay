@@ -16,7 +16,7 @@ El panel emite siempre el mismo nombre de evento con un objeto discriminado por 
 ```ts
 type TriggerEvent =
   | { type: 'set-layout'; layout: LayoutId }   // ver LayoutId en useOverlayStore.ts
-  | { type: 'gag'; gag: 'glitch-interrupt' | 'alerta-falsa' | 'sapo-random' }
+  | { type: 'gag'; gag: 'glitch-interrupt' | 'alerta-falsa' | 'sapo-random'; text?: string }
   | { type: 'set-member'; member: MemberId | null }   // 'chavez'|'aym'|'mots'|'darbolis'|'krilin'
   | { type: 'set-phase'; phase: PhaseId | null }
   | { type: 'timer'; action: 'start' | 'stop'; durationMs?: number }
@@ -24,7 +24,13 @@ type TriggerEvent =
   | { type: 'set-bum-index'; index: number }   // 1..5, se clampea en el store
   | { type: 'sfx'; id: string }                              // soundboard one-shot
   | { type: 'music'; action: 'play' | 'stop'; track?: string }
-  | { type: 'music-volume'; volume: number };  // 0..1, se clampea en el store
+  | { type: 'music-volume'; volume: number }   // 0..1, se clampea en el store
+  | { type: 'media'; action: 'show' | 'update' | 'hide';   // meme en pantalla
+      url?: string; kind?: 'image' | 'video';  // requeridos en show
+      scale?: number; opacity?: number; volume?: number;   // 0..1
+      position?: 'center' | 'tl' | 'tr' | 'bl' | 'br' }
+  | { type: 'set-palette'; palette: 'default' | 'vaporwave' | 'xp-luna' | 'crt' }
+  | { type: 'chat-message'; user: string; msg: string; color?: string };  // NACE EN EL SERVER (kick.js), el panel no lo emite
 ```
 
 `LayoutId` actual (17): `talkshow-grid | plano-general | noticiero | brb-bizarro | intro | tertulia | leccion | ppt | tema | debate | papeado | bum-horizontal | bum-vertical | penitencia | outro | plano-360 | cams-pantalla`.
@@ -40,25 +46,40 @@ Mismo payload `TriggerEvent` que `trigger`. El server no transforma nada, solo r
 - **Emite**: `server/index.js`.
 - **Escucha**: `bindOverlaySocket()` en `client/src/socket.ts` (llamado una vez desde `OverlayApp`):
   - `set-layout` → `setLayout(layout)`
-  - `gag` → `triggerGag(gag)`
+  - `gag` → `triggerGag(gag, text?)` — con `text` (hoy solo lo usa el sapo) el gag lo dice en su burbuja en vez de su contenido random y dura `SAPO_TEXT_DURATION_MS` (6s). Es el **sapo anunciador de donaciones**: el mini-form DONACIÓN del panel manda `¡<nombre> tiró <monto>!` (+ sfx `celebrate` si existe). Mock a propósito — cuando se enchufe la fuente real (Kicks/Streamlabs, a definir) el server emitirá este mismo evento.
   - `set-member` → `setActiveMember(member)` — protagonista de Tertulia, profe de Lección, expositor del PPT
   - `set-phase` → `setPhase(phase)` — muestra/oculta el `PhaseBanner` superior (`null` = oculto)
   - `timer` → `start` llama `startTimer(durationMs ?? DEFAULT_TIMER_MS)` (default 5 min, `DEFAULT_TIMER_MS` en `socket.ts`); `stop` llama `stopTimer()`. Lo renderiza `CountdownTimer` (hoy solo en el layout `ppt`); al expirar queda parpadeando hasta un `stop`.
-  - `set-text` → `setText(key, text)` — textos en pantalla editables por el productor. Defaults en `DEFAULT_TEXTS` (`useOverlayStore.ts`). Claves y consumidores:
+  - `set-text` → `setText(key, text)` — textos en pantalla editables por el productor. Defaults en `DEFAULT_TEXTS` (`useOverlayStore.ts`). Criterio: TODO texto visible en el stream es editable; quedan afuera labels de placeholders (en stream los tapa la cam real) y utilería fija de chiste (personas del TalkshowGrid, créditos extra del Outro). Claves y consumidores:
 
     | `TextKey` | Lo muestra |
     |---|---|
     | `tema` | Tema (título), Lección (subtítulo), PPT (cartel) |
-    | `zocalo` | Noticiero (título del zócalo) |
-    | `ticker` | Noticiero (marquee inferior) |
-    | `penitencia` | Papeado ("SU PENITENCIA: …", vacío = oculto), Penitencia ("CUMPLIENDO: …") |
+    | `eslogan` | CHBug (marquee), Intro, Outro, cortinilla Kazaa |
+    | `window-chat` / `window-set` / `window-plano-general` | Títulos de XPWindow del chat (Intro, PlanoGeneral), de la ventana del set (Tertulia, Debate, Papeado, Penitencia) y del plano general |
+    | `plano360-label` | Plano360 (cartel parpadeante) |
+    | `zocalo` / `ticker` / `noticiero-tag` | Noticiero (título del zócalo, marquee inferior, tag "EN VIVO") |
     | `intro-marquee` | Intro (marquee inferior) |
-    | `brb-sub` | BrbBizarro (subtítulo bajo "YA VOLVEMOS") |
+    | `brb-title` / `brb-sub` | BrbBizarro (título + subtítulo) |
+    | `outro-titulo` / `outro-sub` / `outro-gracias` / `outro-marquee` | Outro (créditos) |
+    | `tema-label` / `tema-window` | Tema (cartel "EL TEMA DE HOY:", título de ventana) |
+    | `leccion-label` | Lección (cartel) |
+    | `ppt-window` / `ppt-timer-label` | PPT (título de ventana, label del countdown) |
+    | `tertulia-pick` / `penitencia-pick` | Tertulia "¿QUIÉN EMPIEZA?" / Penitencia "¿QUIÉN PAGA?" |
+    | `debate-banner` / `debate-vs` | Debate (banner y "VS") |
+    | `papeado-titulo` / `papeado-redoble` / `papeado-sello` / `papeado-label` | Papeado (título, redoble, sello, label "SU PENITENCIA:") |
+    | `penitencia` | Papeado (texto de la penitencia, vacío = oculto), Penitencia ("CUMPLIENDO: …") |
+    | `penitencia-label` / `penitencia-testigos` | Penitencia (label "CUMPLIENDO:", label del strip de testigos) |
+    | `nombre-<member>` | Nombre en pantalla del miembro — nametags (`CamCell`), badges (`MemberBadge`), créditos del Outro y títulos de ventana derivados. Helper `getMemberName(texts, id)` en `useOverlayStore.ts` |
 
   - `set-bum-index` → `setBumIndex(index)` — cuál de los 5 videos/reels del miembro va en los BUM (el dueño se elige con `set-member`).
   - `sfx` → `playSfx(id)` (`overlay/audio.ts`) — **excepción al patrón**: no pasa por el store porque es un one-shot sin estado visual; el handler lo reproduce directo. Ids/archivos en `config/sounds.ts` (convención `sfx_<id>.mp3`, ver COMPONENT_PATTERNS.md).
   - `music` → `setMusic(track | null)` — track del jukebox en loop (`chrome/Jukebox.tsx`, montado en OverlayApp: sobrevive a los cambios de layout). `play` sin `track` válido o `stop` = silencio.
   - `music-volume` → `setMusicVolume(volume)` — solo afecta a la música; los SFX van siempre a full.
+  - `set-palette` → `setPalette(palette)` — re-tematiza el overlay en vivo: OverlayApp aplica `data-palette` en `<html>` y los tokens CSS se overridean (`styles/themes.css`). Paletas y límites en DESIGN_SYSTEM.md, sección "Paletas".
+  - `media` → `showMedia` / `updateMedia` / `hideMedia` — meme (imagen/video) sobre el overlay, lo renderiza `chrome/MediaLayer.tsx` (montado en OverlayApp: sobrevive a los cambios de layout; encima del chrome, debajo de gags). `show` requiere `url` + `kind` (lo demás toma `DEFAULT_MEDIA`); `update` ajusta tamaño/opacidad/volumen/posición en vivo; `hide` lo saca. Las URLs relativas (`/media/…`) se resuelven contra el server (`resolveMediaUrl` en `socket.ts`). **Ojo**: `opacity < 1` sobre un agujero magenta se keyea a medias — decisión del productor. Los archivos se suben por HTTP (fuera de Socket.io): `POST /api/media` (multipart, campo `file`, solo imagen/video, máx 100 MB) responde `{ url }`; `GET /api/media` lista la galería (`server/uploads/`, gitignoreado, servido en `/media/*`); `DELETE /api/media/<archivo>` lo borra del server (el panel primero lo saca de pantalla si estaba al aire). Autoplay de videos: dentro de OBS siempre anda; en un navegador normal el `play()` con sonido se bloquea sin click previo — `MediaLayer` cae a reproducir muteado.
+
+  - `chat-message` → `pushChatMessage({ user, msg, color? })` — mensaje real del chat de Kick. **Excepción al flujo**: es el único evento que nace en el **server** (`server/kick.js`, websocket Pusher de Kick) y no en el panel; se broadcastea con la misma forma `overlay-event`. El store retiene los últimos `CHAT_BUFFER_SIZE` (15) en `chatMessages`; `FakeChat` los muestra, y si nunca llegó ninguno cae a sus mensajes falsos (dev sin `kick-config.json` se ve igual). `color` es el color de nick de la identidad de Kick. Config y checklist en PRODUCCION.md.
 
   El audio suena **en el overlay** (dentro de OBS, por el canal del Browser Source) — el panel no reproduce nada. Ojo: cada instancia extra del overlay abierta en un navegador también suena (ver PRODUCCION.md).
 
@@ -90,7 +111,7 @@ interface CamRectsPayload {
 |---|---|---|
 | `glitch-interrupt` | 1600 ms | Distorsión VHS/glitch a pantalla completa; vuelve solo al layout anterior |
 | `alerta-falsa` | 3200 ms | Banner BREAKING NEWS con shake/parpadeo |
-| `sapo-random` | 4000 ms | Sapo low-poly aparece en posición random, hace algo tonto, se va |
+| `sapo-random` | 4000 ms (6000 ms con `text`) | Sapo low-poly aparece en posición random, hace algo tonto, se va. Con `text` (donaciones) lo dice en la burbuja |
 
 ## Convención para agregar un evento nuevo
 

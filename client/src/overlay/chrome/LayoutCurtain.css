@@ -1,0 +1,84 @@
+/* Cortinilla de transición de layouts. TODO acá es 100% opaco: la cortina
+   pasa por encima de agujeros magenta y cualquier alpha se keyearía a medias
+   (ver ARCHITECTURE.md, "Cámaras reales"). Cada variante define su propia
+   animación de entrada/salida en LayoutCurtain.tsx. */
+
+.layout-curtain {
+  position: absolute;
+  inset: 0;
+  z-index: 300; /* encima de layout (0), chrome (50), memes (80) y gags (100) */
+  overflow: hidden;
+}
+
+.curtain__fill {
+  position: absolute;
+  inset: 0;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  overflow: hidden;
+}
+
+/* ---- Variante 1: cortina de teatro pixelada ---- */
+/* Dos hojas plisadas que se cierran desde los costados. El "3D falso" tipo
+   SNES son franjas verticales de stops DUROS (sin degradé suave) en tres
+   tonos derivados de --y2k-red con color-mix (derivación de paleta
+   documentada en DESIGN_SYSTEM.md, sección Motion). */
+.curtain-teatro__half {
+  position: absolute;
+  top: 0;
+  bottom: 0;
+  width: 52%; /* 52+52 se solapan en el centro: sin ranura con cortina cerrada */
+  background: repeating-linear-gradient(
+    90deg,
+    var(--y2k-red) 0 28px,
+    color-mix(in srgb, var(--y2k-red) 65%, var(--crt-black)) 28px 52px,
+    color-mix(in srgb, var(--y2k-red) 40%, var(--crt-black)) 52px 64px
+  );
+}
+
+.curtain-teatro__half--left {
+  left: 0;
+  border-right: 10px solid var(--warning-yellow); /* borla/fleco interior */
+}
+
+.curtain-teatro__half--right {
+  right: 0;
+  border-left: 10px solid var(--warning-yellow);
+}
+
+/* ---- Variante 2: panel Kazaa con logo (salida = CRT apagándose) ---- */
+.curtain--kazaa {
+  gap: var(--space-3);
+}
+
+.curtain__ch {
+  font-family: var(--font-impact-alt);
+  font-size: clamp(120px, 16vw, 260px);
+  color: var(--bg-cloud-white);
+  text-shadow:
+    6px 6px 0 var(--y2k-purple),
+    12px 12px 0 var(--crt-black);
+  transform: rotate(-3deg);
+}
+
+.curtain__slogan {
+  font-family: var(--font-hand);
+  font-size: clamp(22px, 2.6vw, 40px);
+  color: var(--crt-black);
+  background: var(--warning-yellow);
+  padding: 4px 22px;
+  transform: rotate(1.2deg);
+}
+
+.curtain__loading {
+  font-family: var(--font-pixel);
+  font-size: 18px;
+  color: var(--bg-cloud-white);
+  text-shadow: 2px 2px 0 var(--crt-black);
+}
+
+/* ---- Variante 3: señal perdida ---- */
+/* Sin reglas propias: reusa la clase `glitch-interrupt` (fondo negro opaco +
+   overflow) y el visual GlitchScreen del gag (GlitchInterrupt.css). */

@@ -1,7 +1,6 @@
 import { motion } from 'framer-motion';
 import { SPRING_TORPE, CORTE_BRUSCO } from '../motionPresets';
-import { useOverlayStore } from '../../store/useOverlayStore';
-import { MEMBERS } from '../../config/members';
+import { useOverlayStore, getMemberName } from '../../store/useOverlayStore';
 import { ScreenPlusCams } from './ScreenPlusCams';
 import { DoodleSquiggle, DoodleStar } from '../chrome/Doodles';
 import './Leccion.css';
@@ -13,7 +12,9 @@ import './Leccion.css';
 export function Leccion() {
   const profe = useOverlayStore((s) => s.activeMember);
   const tema = useOverlayStore((s) => s.texts.tema);
-  const screenLabel = profe ? `${MEMBERS[profe].nombre} SCREEN` : 'PANTALLA DEL PROFE';
+  const label = useOverlayStore((s) => s.texts['leccion-label']);
+  const nombre = useOverlayStore((s) => (s.activeMember ? getMemberName(s.texts, s.activeMember) : null));
+  const screenLabel = nombre ? `${nombre} SCREEN` : 'PANTALLA DEL PROFE';
 
   return (
     <motion.div
@@ -24,7 +25,7 @@ export function Leccion() {
     >
       <ScreenPlusCams
         screenLabel={screenLabel}
-        windowTitle={profe ? `leccion_de_${MEMBERS[profe].nombre.toLowerCase()}.ppt` : 'leccion.ppt'}
+        windowTitle={nombre ? `leccion_de_${nombre.toLowerCase()}.ppt` : 'leccion.ppt'}
         screen={profe ? `screen-${profe}` : 'screen-productor'}
         highlight={profe}
       />
@@ -34,7 +35,7 @@ export function Leccion() {
         initial={{ x: -420, rotate: -6 }}
         animate={{ x: 0, rotate: -2, transition: { ...SPRING_TORPE, delay: 0.25 } }}
       >
-        <span className="leccion__titulo-text">LECCIÓN DE HOY</span>
+        <span className="leccion__titulo-text">{label}</span>
         <span className="leccion__titulo-tema">{tema}</span>
         <DoodleSquiggle className="leccion__titulo-squiggle" color="var(--warning-yellow)" size={150} />
       </motion.div>
