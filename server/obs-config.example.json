@@ -1,24 +1,24 @@
 {
-  "enabled": false,
+  "enabled": true,
   "url": "ws://127.0.0.1:4455",
   "password": "PONE_AQUI_LA_PASSWORD_DEL_OBS_WEBSOCKET",
   "scene": "PROGRAMA",
   "sources": {
-    "chavez": "CAM Chavez",
-    "aym": "CAM Aym",
-    "mots": "CAM Mots",
-    "darbolis": "CAM Darbolis",
-    "krilin": "CAM Krilin",
+    "chavez": "cgordo",
+    "aym": "caym",
+    "mots": "cmots",
+    "darbolis": "ccoca",
+    "krilin": "ckrilin",
     "general": "CAM General",
     "noticiero": "CAM Noticiero",
     "plano360": "CAM 360",
-    "screen-chavez": "NDI Screen Chavez",
-    "screen-aym": "NDI Screen Aym",
-    "screen-mots": "NDI Screen Mots",
-    "screen-darbolis": "NDI Screen Darbolis",
-    "screen-krilin": "NDI Screen Krilin",
+    "screen-chavez": "sgordo",
+    "screen-aym": "saym",
+    "screen-mots": "smots",
+    "screen-darbolis": "scoca",
+    "screen-krilin": "skrilin",
     "screen-productor": "Captura Ventana Productor",
-    "screen-bum": "NDI Screen Krilin"
+    "screen-bum": "skrilin"
   },
   "fit": []
 }

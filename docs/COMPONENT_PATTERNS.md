@@ -45,6 +45,7 @@ Donde vaya video real de cámara usar siempre `<CamPlaceholder />` (`client/src/
 - **`CountdownTimer`** (`chrome/CountdownTimer.tsx`) — countdown que lee `timerEndsAt` del store; se controla desde el panel (sección Timer). Renderiza nada sin timer activo.
 - **`FakeChat`** (`chrome/FakeChat.tsx`) — chat falso retro (TODO: acá se enchufa el chat real).
 - **`Doodles`** (`chrome/Doodles.tsx`) — garabatos SVG (`DoodleArrow/Star/Squiggle/Circle`); posicionarlos desde el CSS del layout.
+- **`Carita`** (`chrome/Caritas.tsx`) — carita MS Paint 2D de un miembro (props `member`, `size`). Barata (SVG inline, cero WebGL): usarla donde un busto 3D no entra en presupuesto. Ya integrada en `CamCell` (nametag), `MemberBadge` (sello esquina) y créditos del Outro. No lleva filtros internos; `.sticker` va por fuera y solo en elementos estáticos.
 - **`CHBug` / `PhaseBanner`** — chrome persistente; los monta `OverlayApp`, un layout NUNCA los incluye por su cuenta (excepción: Intro usa `CHBug` en versión XL con `className="ch-bug-wrap--xl"` y por eso está en `LAYOUTS_SIN_BUG`).
 
 Si el layout depende del miembro seleccionado (quién habla/expone), leer `activeMember` del store y resolver los datos con `MEMBERS[activeMember]`; contemplar el caso `null` (ver `Tertulia.tsx` como ejemplo completo).

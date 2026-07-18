@@ -90,6 +90,7 @@ Segunda capa estética sumada en Etapa 2: trazos tipo MS Paint sobre la base Y2K
 | `.sticker` | Contorno blanco grueso tipo sticker recortado + sombra dura | cadena de `drop-shadow` |
 | `.hand-underline` | Subrayado ondulado "a mano" | SVG data-uri repetible en `background-image` |
 | `Doodles.tsx` (`DoodleArrow/Star/Squiggle/Circle`) | Garabatos SVG sueltos para decorar layouts | paths temblorosos, `stroke-linecap: round`, grosor 5-6, color de paleta via prop |
+| `Caritas.tsx` (`Carita member=...`) | Carita MS Paint de cada miembro (2D, no gasta WebGL) | SVG inline, piel/pelo de `members.ts`, trazos `--crt-black`. **Sin filtros adentro**: `.sticker` lo pone el consumidor donde las reglas de rendimiento lo permitan. Espejo del arte de marca (`branding/src/caritas.svg`) — retocar ambos. Usos: nametag de `CamCell`, sello del `MemberBadge`, créditos del Outro |
 
 Criterio: los doodles se posicionan desde el CSS del layout (clases `.mi-layout__doodle-*`), rotados en ángulos raros. Los nametags y títulos "escritos por alguien" van en `--font-hand`; los títulos "de sistema/broadcast" siguen en `--font-impact`.
 

@@ -79,6 +79,22 @@
   font-family: var(--font-hand);
   font-size: 40px;
   text-shadow: 2px 2px 0 var(--crt-black);
+  display: inline-flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.outro__credito-carita {
+  flex: none;
+}
+
+/* rotación alterna, nada prolijo */
+.outro__credito:nth-child(odd) .outro__credito-carita {
+  transform: rotate(-6deg);
+}
+
+.outro__credito:nth-child(even) .outro__credito-carita {
+  transform: rotate(6deg);
 }
 
 .outro__credito-rol {

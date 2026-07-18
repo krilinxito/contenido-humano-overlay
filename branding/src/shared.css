@@ -1,0 +1,121 @@
+/* Base compartida del arte de marca Contenido Humano.
+   Paleta y criterio: docs/DESIGN_SYSTEM.md (espejo manual, no importa tokens.css
+   porque estas páginas se renderizan sueltas con firefox headless). */
+
+@font-face {
+  font-family: 'Bungee';
+  src: url('../fonts/bungee.woff2') format('woff2');
+}
+@font-face {
+  font-family: 'Rubik Mono One';
+  src: url('../fonts/rubik-mono-one.woff2') format('woff2');
+}
+@font-face {
+  font-family: 'Silkscreen';
+  src: url('../fonts/silkscreen.woff2') format('woff2');
+}
+@font-face {
+  font-family: 'Gochi Hand';
+  src: url('../fonts/gochi-hand.woff2') format('woff2');
+}
+@font-face {
+  font-family: 'VT323';
+  src: url('../fonts/vt323.woff2') format('woff2');
+}
+@font-face {
+  font-family: 'Comic Neue';
+  src: url('../fonts/comic-neue.woff2') format('woff2');
+}
+
+:root {
+  --xp-blue-deep: #0a246a;
+  --xp-blue-bright: #3d7eff;
+  --aero-teal: #00c9a7;
+  --aero-lime: #b4f461;
+  --y2k-magenta: #ff3ea5;
+  --y2k-purple: #7b2ff7;
+  --y2k-red: #ff2e2e;
+  --chrome-silver: #d9e4ec;
+  --warning-yellow: #ffe135;
+  --bg-cloud-white: #f4f9ff;
+  --crt-black: #0d0d0d;
+
+  --font-impact: 'Rubik Mono One', monospace;
+  --font-impact-alt: 'Bungee', cursive;
+  --font-comic: 'Comic Neue', cursive;
+  --font-system: Tahoma, 'Trebuchet MS', Verdana, sans-serif;
+  --font-pixel: 'Silkscreen', monospace;
+  --font-terminal: 'VT323', monospace;
+  --font-hand: 'Gochi Hand', 'Patrick Hand', cursive;
+}
+
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+
+html,
+body {
+  overflow: hidden;
+}
+
+/* ---- Utilidades (espejo de retro-utils.css, solo lo que usa el arte) ---- */
+
+.bevel-out {
+  box-shadow:
+    inset 2px 2px 0 rgba(255, 255, 255, 0.9),
+    inset -2px -2px 0 rgba(10, 36, 106, 0.55);
+}
+
+.danger-tape {
+  background: repeating-linear-gradient(
+    45deg,
+    var(--warning-yellow) 0 26px,
+    var(--crt-black) 26px 52px
+  );
+}
+
+.sticker {
+  filter: drop-shadow(2px 0 0 #fff) drop-shadow(-2px 0 0 #fff)
+    drop-shadow(0 2px 0 #fff) drop-shadow(0 -2px 0 #fff)
+    drop-shadow(5px 6px 0 rgba(13, 13, 13, 0.55));
+}
+
+.chroma-text {
+  text-shadow:
+    3px 0 0 var(--y2k-red),
+    -3px 0 0 var(--aero-teal);
+}
+
+/* Réplica del CHBug (client/src/overlay/chrome/CHBug.css) escalable con --ch-scale */
+.ch-logo {
+  --ch-scale: 1;
+  display: inline-flex;
+  flex-direction: column;
+  align-items: center;
+  padding: calc(10px * var(--ch-scale)) calc(14px * var(--ch-scale));
+  background: linear-gradient(
+    23deg,
+    var(--y2k-purple) 0%,
+    var(--y2k-magenta) 60%,
+    var(--warning-yellow) 100%
+  );
+  border: calc(3px * var(--ch-scale)) solid var(--bg-cloud-white);
+}
+
+.ch-logo__ch {
+  font-family: var(--font-impact-alt);
+  font-size: calc(34px * var(--ch-scale));
+  line-height: 1;
+  color: var(--bg-cloud-white);
+  text-shadow: calc(2px * var(--ch-scale)) calc(2px * var(--ch-scale)) 0 var(--crt-black);
+}
+
+.ch-logo__text {
+  font-family: var(--font-pixel);
+  font-size: calc(10px * var(--ch-scale));
+  color: var(--bg-cloud-white);
+  text-shadow: 1px 1px 0 var(--crt-black);
+  white-space: nowrap;
+}

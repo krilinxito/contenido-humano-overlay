@@ -1,6 +1,7 @@
 import { MEMBERS, MEMBER_IDS, type MemberId } from '../../config/members';
 import { useOverlayStore, getMemberName } from '../../store/useOverlayStore';
 import { CamPlaceholder } from './CamPlaceholder';
+import { Carita } from './Caritas';
 import './CamCell.css';
 
 interface CamCellProps {
@@ -25,6 +26,9 @@ export function CamCell({ member, highlight = false, className = '' }: CamCellPr
     >
       <CamPlaceholder label={`CAM ${camIndex + 1}`} index={camIndex} cam={member} />
       <span className="cam-cell__name" style={{ background: data.color }}>
+        {/* Carita 2D barata: N celdas visibles + highlight animado, acá no van
+            filtros (.sticker) — regla de rendimiento en DESIGN_SYSTEM.md. */}
+        <Carita member={member} size={22} className="cam-cell__carita" />
         {nombre}
       </span>
     </div>

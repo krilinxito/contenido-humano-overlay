@@ -1,0 +1,318 @@
+<!doctype html>
+<html lang="es">
+<head>
+<meta charset="utf-8" />
+<title>anuncio stream 1080x1080</title>
+<link rel="stylesheet" href="shared.css" />
+<style>
+  /* Anuncio de stream 1080×1080 (post cuadrado IG/redes).
+     Para el siguiente stream: editar .fecha, .hora y la lista .tz. */
+  body {
+    width: 1080px;
+    height: 1080px;
+    position: relative;
+    background: linear-gradient(
+      156deg,
+      var(--xp-blue-deep) 0%,
+      var(--y2k-purple) 34%,
+      var(--y2k-magenta) 70%,
+      var(--warning-yellow) 100%
+    );
+  }
+
+  .tape {
+    position: absolute;
+    top: 30px;
+    left: -40px;
+    width: 1200px;
+    height: 44px;
+    transform: rotate(-2deg);
+    box-shadow: 0 5px 0 rgba(13, 13, 13, 0.4);
+  }
+
+  .logo-rot {
+    position: absolute;
+    top: 96px;
+    left: 52px;
+    transform: rotate(-5deg);
+  }
+  .ch-logo {
+    --ch-scale: 1.9;
+    filter: url(#wobble);
+  }
+
+  .grito {
+    position: absolute;
+    top: 96px;
+    right: 48px;
+    transform: rotate(4deg);
+    font-family: var(--font-hand);
+    font-size: 62px;
+    line-height: 0.95;
+    text-align: center;
+    color: var(--warning-yellow);
+    text-shadow:
+      3px 3px 0 var(--crt-black),
+      -3px 3px 0 var(--crt-black),
+      3px -3px 0 var(--crt-black),
+      -3px -3px 0 var(--crt-black);
+  }
+
+  .fecha {
+    position: absolute;
+    top: 268px;
+    left: 0;
+    width: 1080px;
+    text-align: center;
+    font-family: var(--font-impact);
+    font-size: 92px;
+    line-height: 1.05;
+    color: var(--bg-cloud-white);
+    transform: rotate(-1.5deg);
+  }
+  .fecha small {
+    display: block;
+    font-family: var(--font-impact-alt);
+    font-size: 46px;
+    color: var(--aero-lime);
+    text-shadow: 3px 3px 0 var(--crt-black);
+  }
+
+  .hora {
+    position: absolute;
+    top: 470px;
+    left: 30px;
+    width: 520px;
+    text-align: center;
+    transform: rotate(-2.5deg);
+  }
+  .hora__num {
+    font-family: var(--font-impact);
+    font-size: 104px;
+    line-height: 1;
+    color: var(--bg-cloud-white);
+  }
+  .hora__pais {
+    display: inline-block;
+    margin-top: 8px;
+    padding: 4px 22px;
+    background: var(--crt-black);
+    font-family: var(--font-pixel);
+    font-size: 34px;
+    color: var(--aero-lime);
+  }
+
+  /* ventanita XP con los horarios de otros países */
+  .xp-window {
+    position: absolute;
+    right: 36px;
+    top: 440px;
+    width: 470px;
+    background: var(--chrome-silver);
+    border: 2px solid var(--xp-blue-deep);
+    transform: rotate(2deg);
+    box-shadow: 7px 8px 0 rgba(13, 13, 13, 0.45);
+  }
+  .xp-window__title {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 6px 10px;
+    background: linear-gradient(113deg, var(--xp-blue-deep) 0%, var(--xp-blue-bright) 85%);
+    color: #fff;
+    font-family: var(--font-system);
+    font-weight: bold;
+    font-size: 21px;
+  }
+  .xp-window__btns { display: flex; gap: 5px; }
+  .xp-window__btn {
+    width: 24px;
+    height: 24px;
+    display: grid;
+    place-items: center;
+    background: var(--chrome-silver);
+    font-family: var(--font-system);
+    font-size: 14px;
+    font-weight: bold;
+    color: var(--crt-black);
+  }
+  .xp-window__btn--x { background: var(--y2k-red); color: #fff; }
+  .xp-window__body {
+    padding: 14px 18px 16px;
+    font-family: var(--font-comic);
+    font-weight: bold;
+    font-size: 25px;
+    line-height: 1.55;
+    color: var(--crt-black);
+  }
+  .tz {
+    display: flex;
+    justify-content: space-between;
+    white-space: nowrap;
+  }
+  .tz b {
+    font-family: var(--font-terminal);
+    font-size: 34px;
+    color: var(--y2k-purple);
+  }
+  .tz--dom b em {
+    font-style: normal;
+    font-size: 22px;
+    color: var(--y2k-red);
+  }
+
+  .url {
+    position: absolute;
+    left: 48px;
+    top: 688px;
+    transform: rotate(-2deg);
+    font-family: var(--font-terminal);
+    font-size: 40px;
+    color: var(--bg-cloud-white);
+    background: rgba(13, 13, 13, 0.65);
+    padding: 2px 18px;
+    white-space: nowrap;
+  }
+
+  /* caritas en fila abajo, cada una a su bola */
+  .carita {
+    position: absolute;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 0;
+  }
+  .carita svg.cara {
+    width: 150px;
+    height: 175px;
+  }
+  .carita .nombre {
+    font-family: var(--font-hand);
+    font-size: 33px;
+    letter-spacing: 1px;
+    text-shadow:
+      2px 2px 0 var(--crt-black),
+      -2px 2px 0 var(--crt-black),
+      2px -2px 0 var(--crt-black),
+      -2px -2px 0 var(--crt-black);
+  }
+
+  .zocalo {
+    position: absolute;
+    bottom: 0;
+    left: 0;
+    width: 1080px;
+    height: 64px;
+    background: var(--crt-black);
+    border-top: 4px solid var(--aero-lime);
+    display: flex;
+    align-items: center;
+    white-space: nowrap;
+    overflow: hidden;
+    font-family: var(--font-hand);
+    font-size: 36px;
+    color: var(--bg-cloud-white);
+    gap: 32px;
+  }
+  .zocalo .star { color: var(--warning-yellow); }
+
+  .doodle, .sparkle { position: absolute; }
+</style>
+</head>
+<body>
+  <svg width="0" height="0" style="position:absolute">
+    <filter id="wobble" x="-10%" y="-10%" width="120%" height="120%">
+      <feTurbulence type="fractalNoise" baseFrequency="0.012" numOctaves="2" seed="7" result="noise"/>
+      <feDisplacementMap in="SourceGraphic" in2="noise" scale="10"/>
+    </filter>
+  </svg>
+
+  <div class="tape danger-tape"></div>
+
+  <!-- doodles -->
+  <svg class="doodle" style="top:220px; left:40px; transform:rotate(-11deg)" width="110" height="110" viewBox="0 0 80 80">
+    <path d="M40 6 L 47 30 L 74 31 L 52 46 L 61 73 L 39 56 L 18 71 L 26 45 L 6 29 L 32 29 Z"
+      fill="none" stroke="#b4f461" stroke-width="5.5" stroke-linecap="round" stroke-linejoin="round"/>
+  </svg>
+  <svg class="doodle" style="top:405px; left:70px; transform:rotate(6deg)" width="220" height="70" viewBox="0 0 120 40">
+    <path d="M4 22 Q 14 4, 24 20 T 44 18 T 64 24 T 84 16 T 112 22"
+      fill="none" stroke="#ffe135" stroke-width="6" stroke-linecap="round"/>
+  </svg>
+  <svg class="sparkle" style="top:230px; right:110px" width="56" height="56" viewBox="0 0 40 40">
+    <path d="M20 2 L 24 16 L 38 20 L 24 24 L 20 38 L 16 24 L 2 20 L 16 16 Z" fill="#f4f9ff" stroke="#0d0d0d" stroke-width="2"/>
+  </svg>
+  <svg class="sparkle" style="top:640px; left:36px" width="50" height="50" viewBox="0 0 40 40">
+    <path d="M20 2 L 24 16 L 38 20 L 24 24 L 20 38 L 16 24 L 2 20 L 16 16 Z" fill="#ffe135" stroke="#0d0d0d" stroke-width="2"/>
+  </svg>
+  <svg class="sparkle" style="bottom:290px; right:60px" width="48" height="48" viewBox="0 0 40 40">
+    <path d="M20 2 L 24 16 L 38 20 L 24 24 L 20 38 L 16 24 L 2 20 L 16 16 Z" fill="#00c9a7" stroke="#0d0d0d" stroke-width="2"/>
+  </svg>
+
+  <div class="logo-rot">
+    <div class="ch-logo">
+      <span class="ch-logo__ch">CH</span>
+      <span class="ch-logo__text">contenido humano</span>
+    </div>
+  </div>
+
+  <div class="grito">¡PRIMER<br />STREAM!</div>
+
+  <div class="fecha chroma-text">
+    SÁBADO 18
+    <small>DE JULIO</small>
+  </div>
+
+  <div class="hora">
+    <div class="hora__num chroma-text">20:00</div>
+    <div class="hora__pais">HORA BOLIVIA</div>
+  </div>
+
+  <div class="xp-window">
+    <div class="xp-window__title">
+      <span>C:\HORARIOS.txt</span>
+      <span class="xp-window__btns">
+        <span class="xp-window__btn bevel-out">_</span>
+        <span class="xp-window__btn bevel-out">□</span>
+        <span class="xp-window__btn xp-window__btn--x bevel-out">✕</span>
+      </span>
+    </div>
+    <div class="xp-window__body">
+      <div class="tz"><span>🇧🇴🇨🇱 Bolivia / Chile</span> <b>20:00</b></div>
+      <div class="tz"><span>🇦🇷 Argentina</span> <b>21:00</b></div>
+      <div class="tz"><span>🇵🇪🇨🇴 Perú / Col / Ec</span> <b>19:00</b></div>
+      <div class="tz"><span>🇲🇽 México</span> <b>18:00</b></div>
+      <div class="tz tz--dom"><span>🇪🇸 España</span> <b>02:00 <em>(dom)</em></b></div>
+    </div>
+  </div>
+
+  <div class="url">kick.com/contenidohumano</div>
+
+  <!-- caritas en fila (orden oficial, rotaciones raras) -->
+  <div class="carita" style="left:22px; bottom:78px; transform:rotate(-8deg)">
+    <svg class="cara sticker"><use href="caritas.svg#cara-aym"/></svg>
+    <span class="nombre" style="color:#3d7eff">AYM</span>
+  </div>
+  <div class="carita" style="left:232px; bottom:64px; transform:rotate(6deg)">
+    <svg class="cara sticker"><use href="caritas.svg#cara-darbolis"/></svg>
+    <span class="nombre" style="color:#7b2ff7">DARBOLIS</span>
+  </div>
+  <div class="carita" style="left:452px; bottom:80px; transform:rotate(-4deg)">
+    <svg class="cara sticker"><use href="caritas.svg#cara-mots"/></svg>
+    <span class="nombre" style="color:#ff2e2e">MOTS</span>
+  </div>
+  <div class="carita" style="left:672px; bottom:62px; transform:rotate(7deg)">
+    <svg class="cara sticker"><use href="caritas.svg#cara-krilin"/></svg>
+    <span class="nombre" style="color:#ff3ea5">KRILIN</span>
+  </div>
+  <div class="carita" style="left:892px; bottom:78px; transform:rotate(-6deg)">
+    <svg class="cara sticker"><use href="caritas.svg#cara-chavez"/></svg>
+    <span class="nombre" style="color:#b4f461">CHAVEZ</span>
+  </div>
+
+  <div class="zocalo">
+    <span>&nbsp;&nbsp;En la era de la inteligencia artificial abraza la estupidez humana</span>
+    <span class="star">★</span>
+    <span>En la era de la inteligencia artificial abraza la estupidez humana</span>
+  </div>
+</body>
+</html>

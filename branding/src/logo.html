@@ -1,0 +1,126 @@
+<!doctype html>
+<html lang="es">
+<head>
+<meta charset="utf-8" />
+<title>logo CH 1080</title>
+<link rel="stylesheet" href="shared.css" />
+<style>
+  /* Foto de perfil IG/YT/Kick. Las 3 plataformas recortan en círculo:
+     todo lo importante vive dentro del círculo inscrito. */
+  body {
+    width: 1080px;
+    height: 1080px;
+    position: relative;
+    /* cielo XP en ángulo raro */
+    background: linear-gradient(
+      113deg,
+      var(--xp-blue-deep) 0%,
+      var(--xp-blue-bright) 34%,
+      var(--aero-teal) 72%,
+      var(--bg-cloud-white) 100%
+    );
+  }
+
+  .cloud {
+    position: absolute;
+    fill: rgba(244, 249, 255, 0.92);
+    stroke: rgba(13, 13, 13, 0.35);
+    stroke-width: 5;
+    stroke-linejoin: round;
+  }
+
+  .center {
+    position: absolute;
+    inset: 0;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+  }
+
+  .logo-rot {
+    transform: rotate(-6deg);
+  }
+
+  /* Versión perfil: CH protagonista, caja casi cuadrada que llena el círculo
+     inscrito (r=540) sin tocarlo. Tamaños explícitos, no --ch-scale (acá el
+     CH crece mucho más que el resto). */
+  .ch-logo {
+    filter: url(#wobble);
+    padding: 34px 58px 44px;
+    border-width: 16px;
+    gap: 6px;
+  }
+
+  .ch-logo__ch {
+    font-size: 395px;
+    text-shadow: 18px 18px 0 var(--crt-black);
+  }
+
+  .ch-logo__text {
+    font-size: 45px;
+    text-shadow: 4px 4px 0 var(--crt-black);
+  }
+
+  .sparkle {
+    position: absolute;
+  }
+
+  .doodle {
+    position: absolute;
+  }
+</style>
+</head>
+<body>
+  <svg width="0" height="0" style="position:absolute">
+    <filter id="wobble" x="-10%" y="-10%" width="120%" height="120%">
+      <feTurbulence type="fractalNoise" baseFrequency="0.012" numOctaves="2" seed="7" result="noise"/>
+      <feDisplacementMap in="SourceGraphic" in2="noise" scale="14"/>
+    </filter>
+  </svg>
+
+  <!-- nubes Paint -->
+  <svg class="cloud" style="top:88px; left:96px" width="300" height="130" viewBox="0 0 300 130">
+    <path d="M40 96 Q 8 94, 16 66 Q 22 42, 52 48 Q 58 18, 96 24 Q 130 8, 152 34 Q 190 20, 204 52 Q 244 46, 248 76 Q 262 100, 228 102 Q 140 110, 40 96 Z"/>
+  </svg>
+  <svg class="cloud" style="bottom:110px; right:70px; transform:rotate(7deg)" width="250" height="110" viewBox="0 0 300 130">
+    <path d="M40 96 Q 8 94, 16 66 Q 22 42, 52 48 Q 58 18, 96 24 Q 130 8, 152 34 Q 190 20, 204 52 Q 244 46, 248 76 Q 262 100, 228 102 Q 140 110, 40 96 Z"/>
+  </svg>
+  <svg class="cloud" style="top:300px; right:60px; transform:rotate(-5deg) scale(0.6)" width="300" height="130" viewBox="0 0 300 130">
+    <path d="M40 96 Q 8 94, 16 66 Q 22 42, 52 48 Q 58 18, 96 24 Q 130 8, 152 34 Q 190 20, 204 52 Q 244 46, 248 76 Q 262 100, 228 102 Q 140 110, 40 96 Z"/>
+  </svg>
+
+  <!-- sparkles de 4 puntas -->
+  <svg class="sparkle" style="top:190px; right:250px" width="70" height="70" viewBox="0 0 40 40">
+    <path d="M20 2 L 24 16 L 38 20 L 24 24 L 20 38 L 16 24 L 2 20 L 16 16 Z" fill="#ffe135" stroke="#0d0d0d" stroke-width="2"/>
+  </svg>
+  <svg class="sparkle" style="bottom:230px; left:200px" width="52" height="52" viewBox="0 0 40 40">
+    <path d="M20 2 L 24 16 L 38 20 L 24 24 L 20 38 L 16 24 L 2 20 L 16 16 Z" fill="#f4f9ff" stroke="#0d0d0d" stroke-width="2"/>
+  </svg>
+  <svg class="sparkle" style="top:330px; left:150px" width="40" height="40" viewBox="0 0 40 40">
+    <path d="M20 2 L 24 16 L 38 20 L 24 24 L 20 38 L 16 24 L 2 20 L 16 16 Z" fill="#b4f461" stroke="#0d0d0d" stroke-width="2"/>
+  </svg>
+  <svg class="sparkle" style="bottom:180px; right:330px" width="44" height="44" viewBox="0 0 40 40">
+    <path d="M20 2 L 24 16 L 38 20 L 24 24 L 20 38 L 16 24 L 2 20 L 16 16 Z" fill="#ff3ea5" stroke="#0d0d0d" stroke-width="2"/>
+  </svg>
+
+  <!-- estrella doodle (Doodles.tsx) -->
+  <svg class="doodle" style="top:120px; right:140px; transform:rotate(14deg)" width="110" height="110" viewBox="0 0 80 80">
+    <path d="M40 6 L 47 30 L 74 31 L 52 46 L 61 73 L 39 56 L 18 71 L 26 45 L 6 29 L 32 29 Z"
+      fill="none" stroke="#ffe135" stroke-width="5.5" stroke-linecap="round" stroke-linejoin="round"/>
+  </svg>
+  <!-- squiggle -->
+  <svg class="doodle" style="bottom:130px; left:330px; transform:rotate(-8deg)" width="200" height="66" viewBox="0 0 120 40">
+    <path d="M4 22 Q 14 4, 24 20 T 44 18 T 64 24 T 84 16 T 112 22"
+      fill="none" stroke="#00c9a7" stroke-width="6" stroke-linecap="round"/>
+  </svg>
+
+  <div class="center">
+    <div class="logo-rot">
+      <div class="ch-logo">
+        <span class="ch-logo__ch">CH</span>
+        <span class="ch-logo__text">contenido humano</span>
+      </div>
+    </div>
+  </div>
+</body>
+</html>

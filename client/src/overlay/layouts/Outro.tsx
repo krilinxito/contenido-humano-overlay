@@ -6,6 +6,7 @@ import { useOverlayStore, getMemberName } from '../../store/useOverlayStore';
 import { LowPolyScene } from '../../three/LowPolyScene';
 import { AvatarColumn } from '../../three/avatars/AvatarRow';
 import { MarqueeText } from '../chrome/MarqueeText';
+import { Carita } from '../chrome/Caritas';
 import './Outro.css';
 
 // Filas de créditos de miembros con alto FIJO: así el AvatarColumn (un solo
@@ -61,6 +62,9 @@ export function Outro() {
               <div key={id} className="outro__credito">
                 <div className="outro__credito-avatar" />
                 <span className="outro__credito-nombre" style={{ color: MEMBERS[id].color }}>
+                  {/* Carita: hija estática dentro del roll animado — el filtro
+                      .sticker va acá y no en el wrapper que se mueve. */}
+                  <Carita member={id} size={46} className="outro__credito-carita sticker" />
                   {getMemberName(texts, id)}
                 </span>
                 <span className="outro__credito-rol">“{adjetivos[id]}”</span>

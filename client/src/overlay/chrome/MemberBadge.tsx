@@ -2,6 +2,7 @@ import { useMemo } from 'react';
 import { MEMBERS, randomAdjetivo, type MemberId } from '../../config/members';
 import { useOverlayStore, getMemberName } from '../../store/useOverlayStore';
 import { AvatarBust } from '../../three/avatars/AvatarBust';
+import { Carita } from './Caritas';
 import './MemberBadge.css';
 
 interface MemberBadgeProps {
@@ -34,6 +35,11 @@ export function MemberBadge({ member, size = 'lg', className = '' }: MemberBadge
         </div>
         <div className="member-badge__nombre">{nombre}</div>
         {size === 'lg' && <div className="member-badge__adjetivo">“{adjetivo}”</div>}
+        {/* Sello carita Paint en la esquina: estático, fuera del subtree del
+            canvas 3D — el .sticker rasteriza una sola vez. */}
+        <div className="member-badge__carita sticker">
+          <Carita member={member} size={size === 'lg' ? 64 : 34} />
+        </div>
       </div>
     </div>
   );

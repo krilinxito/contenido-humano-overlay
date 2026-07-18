@@ -41,4 +41,14 @@
   font-size: 17px;
   color: var(--crt-black);
   transform: rotate(-1.5deg);
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+}
+
+.cam-cell__carita {
+  flex: none;
+  transform: rotate(-4deg);
+  /* que asome un pelín por arriba del nametag, tipo sticker pegado */
+  margin-top: -4px;
 }
