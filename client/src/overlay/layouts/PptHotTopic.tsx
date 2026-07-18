@@ -11,12 +11,14 @@ import './PptHotTopic.css';
 
 /**
  * Hot topic PPT: la presentación trucha del expositor (`set-member`) en
- * grande + su cam chica + countdown de 5 min (panel: botones de Timer).
+ * grande + su cam chica + cam general del set + countdown de 5 min
+ * (panel: botones de Timer).
  */
 export function PptHotTopic() {
   const presenter = useOverlayStore((s) => s.activeMember);
   const tema = useOverlayStore((s) => s.texts.tema);
   const windowTitle = useOverlayStore((s) => s.texts['ppt-window']);
+  const setTitle = useOverlayStore((s) => s.texts['window-set']);
   const timerLabel = useOverlayStore((s) => s.texts['ppt-timer-label']);
   const nombre = useOverlayStore((s) => (s.activeMember ? getMemberName(s.texts, s.activeMember) : null));
 
@@ -54,6 +56,16 @@ export function PptHotTopic() {
             index={presenter ? MEMBER_IDS.indexOf(presenter) : 0}
             cam={presenter ?? undefined}
           />
+        </XPWindow>
+      </motion.div>
+
+      <motion.div
+        className="ppt__general"
+        initial={{ x: 300, rotate: -5 }}
+        animate={{ x: 0, rotate: -1.2, transition: { ...SPRING_TORPE, delay: 0.28 } }}
+      >
+        <XPWindow title={setTitle} className="ppt__window">
+          <CamPlaceholder label="CAM GENERAL" index={2} cam="general" />
         </XPWindow>
       </motion.div>
 

@@ -1,0 +1,13 @@
+.chat-overlay {
+  position: absolute;
+  top: 12%;
+  right: 22px;
+  bottom: 13%;
+  width: 23%;
+  z-index: 60; /* encima del chrome (50), debajo de memes (80) y gags (100) */
+}
+
+.chat-overlay__window {
+  width: 100%;
+  height: 100%;
+}

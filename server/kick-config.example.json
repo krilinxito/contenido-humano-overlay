@@ -1,5 +1,6 @@
 {
   "enabled": false,
   "channel": "slug-del-canal-en-kick",
-  "chatroomId": null
+  "chatroomId": null,
+  "channelId": null
 }

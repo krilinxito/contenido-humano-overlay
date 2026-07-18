@@ -154,6 +154,7 @@ export function PanelApp() {
   const [musicTrack, setMusicTrack] = useState<string | null>(null);
   const [musicVol, setMusicVol] = useState(0.5);
   const [palette, setPalette] = useState<PaletteId>('default');
+  const [chatShown, setChatShown] = useState(false);
   const [donaNombre, setDonaNombre] = useState('');
   const [donaMonto, setDonaMonto] = useState('');
   const [gallery, setGallery] = useState<MediaItem[]>([]);
@@ -225,6 +226,13 @@ export function PanelApp() {
     setMusicVol(volume);
     emitTrigger({ type: 'music-volume', volume });
     setLastSent(`música vol → ${Math.round(volume * 100)}%`);
+  };
+
+  const toggleChat = () => {
+    const visible = !chatShown;
+    emitTrigger({ type: 'chat-overlay', visible });
+    setChatShown(visible);
+    setLastSent(`chat → ${visible ? 'visible' : 'oculto'}`);
   };
 
   // Mock de donaciones (botón manual): el sapo anunciador dice el texto.
@@ -456,6 +464,19 @@ export function PanelApp() {
                     {g.emoji} {g.label}
                   </button>
                 ))}
+              </div>
+            </section>
+
+            <section className="panel__group bevel-out">
+              <span className="panel__group-label">CHAT</span>
+              <div className="panel__row">
+                <button
+                  className={`panel__chip ${chatShown ? 'panel__chip--active' : ''}`}
+                  title="chat de Kick flotante sobre el overlay"
+                  onClick={toggleChat}
+                >
+                  💬 {chatShown ? 'OCULTAR' : 'MOSTRAR'}
+                </button>
               </div>
             </section>
 

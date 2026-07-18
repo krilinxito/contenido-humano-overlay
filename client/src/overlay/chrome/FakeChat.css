@@ -1,9 +1,11 @@
+/* Fondo oscuro a propósito: los colores de nick que manda Kick son claros
+   (pensados para el tema oscuro de Kick) y sobre blanco no se leían. */
 .fake-chat {
   position: absolute;
   inset: 0;
   display: flex;
   flex-direction: column;
-  background: var(--bg-cloud-white);
+  background: var(--crt-black);
 }
 
 .fake-chat__list {
@@ -21,17 +23,17 @@
   font-family: var(--font-comic);
   font-size: 17px;
   line-height: 1.25;
-  color: var(--crt-black);
+  color: var(--bg-cloud-white);
 }
 
 .fake-chat__msg:nth-child(2n) {
-  background: rgba(180, 244, 97, 0.35);
+  background: rgba(180, 244, 97, 0.14);
 }
 
 .fake-chat__user {
   font-family: var(--font-pixel);
   font-size: 12px;
-  color: var(--y2k-purple);
+  color: var(--aero-lime);
 }
 
 .fake-chat__msg:nth-child(3n) .fake-chat__user {

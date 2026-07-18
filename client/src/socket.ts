@@ -12,6 +12,7 @@ import {
 import type { MemberId } from './config/members';
 import type { HoleId } from './config/cams';
 import { playSfx } from './overlay/audio';
+import { SFX_SOUNDS } from './config/sounds';
 
 /** Duración default del countdown de hot topics: 5 minutos. */
 export const DEFAULT_TIMER_MS = 5 * 60 * 1000;
@@ -39,9 +40,12 @@ export type TriggerEvent =
       position?: MediaPosition;
     }
   | { type: 'set-palette'; palette: PaletteId }
-  // Único evento que NACE en el server (server/kick.js, chat real de Kick);
-  // el panel nunca lo emite. Llega igual que todo, por `overlay-event`.
-  | { type: 'chat-message'; user: string; msg: string; color?: string };
+  // Chat de Kick flotante sobre el overlay (botón CHAT del panel).
+  | { type: 'chat-overlay'; visible: boolean }
+  // Eventos que NACEN en el server (server/kick.js, integración Kick);
+  // el panel nunca los emite. Llegan igual que todo, por `overlay-event`.
+  | { type: 'chat-message'; user: string; msg: string; color?: string }
+  | { type: 'follow'; user?: string };
 
 /** Rect de una ventana de cámara o pantalla, normalizado 0..1 sobre el viewport del overlay. */
 export interface CamRect {
@@ -109,6 +113,7 @@ export function bindOverlaySocket(): () => void {
       hideMedia,
       setPalette,
       pushChatMessage,
+      setChatOverlay,
     } = useOverlayStore.getState();
     switch (event.type) {
       // Con cortinilla: el swap del layout pasa tapado (ver LayoutCurtain).
@@ -172,6 +177,18 @@ export function bindOverlaySocket(): () => void {
       case 'chat-message':
         pushChatMessage({ user: event.user, msg: event.msg, color: event.color });
         break;
+      case 'chat-overlay':
+        setChatOverlay(event.visible);
+        break;
+      // Follow de Kick: lo anuncia el sapo (mismo mecanismo que las
+      // donaciones) + sfx `follow` si existe, con fallback a `celebrate`.
+      case 'follow': {
+        const nombre = event.user?.trim();
+        triggerGag('sapo-random', nombre ? `¡${nombre} ahora sigue el canal!` : '¡nuevo seguidor en el canal!');
+        const sfxId = ['follow', 'celebrate'].find((id) => SFX_SOUNDS.some((s) => s.id === id));
+        if (sfxId) playSfx(sfxId);
+        break;
+      }
     }
   };
   s.on('overlay-event', onOverlayEvent);

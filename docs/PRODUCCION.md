@@ -44,9 +44,10 @@ Prueba rápida sin salir al aire: con OBS y el server corriendo, cambiar layouts
 ## Chat real de Kick
 
 - Copiar `server/kick-config.example.json` → `server/kick-config.json` (gitignoreado) y poner `"enabled": true` + `"channel": "<slug del canal>"` (el slug es lo que va en la URL `kick.com/<slug>`).
-- El server se conecta **solo lectura, sin cuenta ni token** al websocket público de Kick y re-emite cada mensaje como `chat-message` (ver EVENTS.md); lo muestran los chats de Intro y Plano General. Sin config o con Kick caído, el overlay cae a los mensajes falsos de siempre — nunca rompe el show.
-- Si en el log aparece `no pude resolver el canal` (Cloudflare a veces bloquea la API server-side): abrir `kick.com/api/v2/channels/<slug>` en un navegador, copiar el `chatroom.id` del JSON y ponerlo como `"chatroomId"` en el json. El server lo usa de fallback.
-- Verificación pre-show: mandar un mensaje en el chat de Kick y verlo aparecer en el overlay (layout Intro o Plano General).
+- El server se conecta **solo lectura, sin cuenta ni token** al websocket público de Kick y re-emite cada mensaje como `chat-message` (ver EVENTS.md); lo muestran los chats de Intro y Plano General, y el botón **CHAT** del panel lo superpone flotante sobre cualquier layout (evento `chat-overlay`). Sin config o con Kick caído, el overlay cae a los mensajes falsos de siempre — nunca rompe el show.
+- Si en el log aparece `no pude resolver el canal` (Cloudflare a veces bloquea la API server-side): abrir `kick.com/api/v2/channels/<slug>` en un navegador, copiar el `chatroom.id` del JSON y ponerlo como `"chatroomId"` en el json, y el `id` de la raíz del mismo JSON como `"channelId"`.
+- **Avisos de follow**: el server también escucha `channel.<channelId>` y ante cada seguidor nuevo dispara el sapo anunciador + sonido (evento `follow`, ver EVENTS.md). Necesita el `channelId` (lo resuelve de la API, o manual en el json); sin él el chat anda igual y solo se apagan los avisos (queda logueado `avisos de follow apagados`). El sonido es `sfx_follow.mp3` si existe en `client/src/assets/audio/`; si no, cae a `sfx_celebrate.mp3`.
+- Verificación pre-show: mandar un mensaje en el chat de Kick y verlo aparecer en el overlay (botón CHAT del panel o layout Intro / Plano General); seguir el canal con una cuenta de prueba y ver salir al sapo con sonido.
 
 ## Checklist de NDI (las 5 laptops)
 

@@ -35,6 +35,8 @@ Cada miembro además tiene un **color de acento asignado** (definido en `client/
 
 Excepción de paleta documentada: el layout Lección usa un fondo **verde pizarrón** propio (`#2a6b4f → #143528`, en `Leccion.css`) porque ningún verde de la paleta funciona como pizarrón; no usarlo fuera de ese contexto.
 
+Decisión documentada: el chat (`FakeChat`) va sobre fondo **oscuro** (`--crt-black`, texto `--bg-cloud-white`, nicks default en lima/magenta) — los colores de nick que manda Kick están pensados para su tema oscuro y sobre blanco no se leían.
+
 ## Paletas (re-tematizado en vivo — `client/src/styles/themes.css`)
 
 El productor puede cambiar la paleta del overlay en vivo (evento `set-palette`, selector en el panel): `themes.css` overridea los tokens de la tabla de arriba bajo `[data-palette="<id>"]` en `<html>` (lo aplica `OverlayApp`). La default es la paleta de la tabla, sin atributo. Alternativas:

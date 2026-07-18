@@ -265,6 +265,8 @@ interface OverlayState {
   /** Últimos mensajes reales del chat de Kick; vacío = nunca llegó nada
    *  (FakeChat cae a sus mensajes falsos — dev sin config se ve igual). */
   chatMessages: ChatMessage[];
+  /** Chat flotante sobre el overlay (botón CHAT del panel, evento `chat-overlay`). */
+  chatOverlay: boolean;
   /** Track del jukebox sonando (id de MUSIC_TRACKS); null = silencio. */
   musicTrack: string | null;
   /** Volumen de la música 0..1 (los SFX van siempre a full). */
@@ -285,6 +287,7 @@ interface OverlayState {
   hideMedia: () => void;
   setPalette: (palette: PaletteId) => void;
   pushChatMessage: (message: ChatMessage) => void;
+  setChatOverlay: (visible: boolean) => void;
   setMusic: (track: string | null) => void;
   setMusicVolume: (volume: number) => void;
 }
@@ -306,6 +309,7 @@ export const useOverlayStore = create<OverlayState>((set, get) => ({
   media: null,
   palette: 'default',
   chatMessages: [],
+  chatOverlay: false,
   musicTrack: null,
   musicVolume: 0.5,
 
@@ -367,6 +371,8 @@ export const useOverlayStore = create<OverlayState>((set, get) => ({
 
   pushChatMessage: (message) =>
     set((s) => ({ chatMessages: [...s.chatMessages, message].slice(-CHAT_BUFFER_SIZE) })),
+
+  setChatOverlay: (visible) => set({ chatOverlay: visible }),
 
   setMusic: (track) => set({ musicTrack: track }),
 

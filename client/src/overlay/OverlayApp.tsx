@@ -9,6 +9,7 @@ import { PhaseBanner } from './chrome/PhaseBanner';
 import { Jukebox } from './chrome/Jukebox';
 import { LayoutCurtain } from './chrome/LayoutCurtain';
 import { MediaLayer } from './chrome/MediaLayer';
+import { ChatOverlay } from './chrome/ChatOverlay';
 import { TalkshowGrid } from './layouts/TalkshowGrid';
 import { PlanoGeneral } from './layouts/PlanoGeneral';
 import { Noticiero } from './layouts/Noticiero';
@@ -73,6 +74,7 @@ export function OverlayApp() {
   const layout = useOverlayStore((s) => s.layout);
   const activeGag = useOverlayStore((s) => s.activeGag);
   const palette = useOverlayStore((s) => s.palette);
+  const chatOverlay = useOverlayStore((s) => s.chatOverlay);
 
   useEffect(() => bindOverlaySocket(), []);
   // Solo activo con `?cams=real` (la instancia que corre dentro de OBS).
@@ -100,6 +102,8 @@ export function OverlayApp() {
       )}
       <PhaseBanner />
       <Jukebox />
+      {/* Chat flotante toggleable desde el panel (evento `chat-overlay`) */}
+      <AnimatePresence>{chatOverlay && <ChatOverlay />}</AnimatePresence>
       {/* Meme en pantalla (evento `media` del panel) — sobre el chrome,
           debajo de los gags. */}
       <MediaLayer />

@@ -30,7 +30,9 @@ type TriggerEvent =
       scale?: number; opacity?: number; volume?: number;   // 0..1
       position?: 'center' | 'tl' | 'tr' | 'bl' | 'br' }
   | { type: 'set-palette'; palette: 'default' | 'vaporwave' | 'xp-luna' | 'crt' }
-  | { type: 'chat-message'; user: string; msg: string; color?: string };  // NACE EN EL SERVER (kick.js), el panel no lo emite
+  | { type: 'chat-overlay'; visible: boolean }   // chat de Kick flotante sobre el overlay (botón CHAT)
+  | { type: 'chat-message'; user: string; msg: string; color?: string }  // NACE EN EL SERVER (kick.js), el panel no lo emite
+  | { type: 'follow'; user?: string };           // NACE EN EL SERVER (kick.js): seguidor nuevo en Kick
 ```
 
 `LayoutId` actual (17): `talkshow-grid | plano-general | noticiero | brb-bizarro | intro | tertulia | leccion | ppt | tema | debate | papeado | bum-horizontal | bum-vertical | penitencia | outro | plano-360 | cams-pantalla`.
@@ -56,7 +58,7 @@ Mismo payload `TriggerEvent` que `trigger`. El server no transforma nada, solo r
     |---|---|
     | `tema` | Tema (título), Lección (subtítulo), PPT (cartel) |
     | `eslogan` | CHBug (marquee), Intro, Outro, cortinilla Kazaa |
-    | `window-chat` / `window-set` / `window-plano-general` | Títulos de XPWindow del chat (Intro, PlanoGeneral), de la ventana del set (Tertulia, Debate, Papeado, Penitencia) y del plano general |
+    | `window-chat` / `window-set` / `window-plano-general` | Títulos de XPWindow del chat (Intro, PlanoGeneral, ChatOverlay flotante), de la ventana del set (Tertulia, Debate, Papeado, Penitencia, cam general del PPT) y del plano general |
     | `plano360-label` | Plano360 (cartel parpadeante) |
     | `zocalo` / `ticker` / `noticiero-tag` | Noticiero (título del zócalo, marquee inferior, tag "EN VIVO") |
     | `intro-marquee` | Intro (marquee inferior) |
@@ -79,7 +81,11 @@ Mismo payload `TriggerEvent` que `trigger`. El server no transforma nada, solo r
   - `set-palette` → `setPalette(palette)` — re-tematiza el overlay en vivo: OverlayApp aplica `data-palette` en `<html>` y los tokens CSS se overridean (`styles/themes.css`). Paletas y límites en DESIGN_SYSTEM.md, sección "Paletas".
   - `media` → `showMedia` / `updateMedia` / `hideMedia` — meme (imagen/video) sobre el overlay, lo renderiza `chrome/MediaLayer.tsx` (montado en OverlayApp: sobrevive a los cambios de layout; encima del chrome, debajo de gags). `show` requiere `url` + `kind` (lo demás toma `DEFAULT_MEDIA`); `update` ajusta tamaño/opacidad/volumen/posición en vivo; `hide` lo saca. Las URLs relativas (`/media/…`) se resuelven contra el server (`resolveMediaUrl` en `socket.ts`). **Ojo**: `opacity < 1` sobre un agujero magenta se keyea a medias — decisión del productor. Los archivos se suben por HTTP (fuera de Socket.io): `POST /api/media` (multipart, campo `file`, solo imagen/video, máx 100 MB) responde `{ url }`; `GET /api/media` lista la galería (`server/uploads/`, gitignoreado, servido en `/media/*`); `DELETE /api/media/<archivo>` lo borra del server (el panel primero lo saca de pantalla si estaba al aire). Autoplay de videos: dentro de OBS siempre anda; en un navegador normal el `play()` con sonido se bloquea sin click previo — `MediaLayer` cae a reproducir muteado.
 
-  - `chat-message` → `pushChatMessage({ user, msg, color? })` — mensaje real del chat de Kick. **Excepción al flujo**: es el único evento que nace en el **server** (`server/kick.js`, websocket Pusher de Kick) y no en el panel; se broadcastea con la misma forma `overlay-event`. El store retiene los últimos `CHAT_BUFFER_SIZE` (15) en `chatMessages`; `FakeChat` los muestra, y si nunca llegó ninguno cae a sus mensajes falsos (dev sin `kick-config.json` se ve igual). `color` es el color de nick de la identidad de Kick. Config y checklist en PRODUCCION.md.
+  - `chat-overlay` → `setChatOverlay(visible)` — muestra/oculta el chat de Kick flotante sobre cualquier layout (`chrome/ChatOverlay.tsx`, montado en OverlayApp: sobrevive a los cambios de layout; z 60 — encima del chrome, debajo de memes y gags). Lo dispara el botón CHAT del panel.
+
+  - `chat-message` → `pushChatMessage({ user, msg, color? })` — mensaje real del chat de Kick. **Excepción al flujo**: nace en el **server** (`server/kick.js`, websocket Pusher de Kick) y no en el panel; se broadcastea con la misma forma `overlay-event`. El store retiene los últimos `CHAT_BUFFER_SIZE` (15) en `chatMessages`; `FakeChat` los muestra, y si nunca llegó ninguno cae a sus mensajes falsos (dev sin `kick-config.json` se ve igual). `color` es el color de nick de la identidad de Kick. Config y checklist en PRODUCCION.md.
+
+  - `follow` → seguidor nuevo del canal de Kick. También nace en el **server** (`kick.js` escucha `App\Events\FollowersUpdated` en `channel.<channelId>` y filtra: solo `followed: true` con el contador subiendo). El handler no toca el store: dispara el **sapo anunciador** (`triggerGag('sapo-random', ...)`) con `¡<user> ahora sigue el canal!` (o texto genérico si Kick no mandó username) + sfx `follow` si existe, con fallback a `celebrate`. Config del `channelId` en PRODUCCION.md.
 
   El audio suena **en el overlay** (dentro de OBS, por el canal del Browser Source) — el panel no reproduce nada. Ojo: cada instancia extra del overlay abierta en un navegador también suena (ver PRODUCCION.md).
 
